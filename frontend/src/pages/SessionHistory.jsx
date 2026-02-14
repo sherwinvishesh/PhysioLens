@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { SessionAnalyzer, getPerformanceScore } from '../utils/advancedAnalysis'
 import { getExerciseConfig } from '../utils/exerciseConfigs'
 import References from '../components/References'
+import ClinicalResources from '../components/ClinicalResources'
 
 function SessionHistory() {
   const navigate = useNavigate()
@@ -13,12 +14,12 @@ function SessionHistory() {
   const videoRef = useRef(null)
 
   // Analysis state
-    const [analysisResults, setAnalysisResults] = useState(null)
-    const [claudeAnalysis, setClaudeAnalysis] = useState(null)
-    const [isAnalyzing, setIsAnalyzing] = useState(false)
-    const [showDetailedIssues, setShowDetailedIssues] = useState(false)
-    const [filterSeverity, setFilterSeverity] = useState('all')
-    const [sessionReferences, setSessionReferences] = useState(null) 
+  const [analysisResults, setAnalysisResults] = useState(null)
+  const [claudeAnalysis, setClaudeAnalysis] = useState(null)
+  const [isAnalyzing, setIsAnalyzing] = useState(false)
+  const [showDetailedIssues, setShowDetailedIssues] = useState(false)
+  const [filterSeverity, setFilterSeverity] = useState('all')
+  const [sessionReferences, setSessionReferences] = useState(null)
 
   // NEW: Loading animation state
   const [analysisProgress, setAnalysisProgress] = useState(0)
@@ -46,28 +47,28 @@ function SessionHistory() {
     }
   }
 
-const handleSessionClick = async (session) => {
-  setSelectedSession(session)
-  setCurrentTime(0)
-  setOpenMenuId(null)
-  setAnalysisResults(null)
-  setClaudeAnalysis(null)
-  setSessionReferences(null) // ADD THIS LINE
-  setShowDetailedIssues(false)
-  setAnalysisProgress(0)
-  setIsLoadingAnalysis(false)
-  
-  // NEW: Check if analysis is already stored for this session
-  if (session.storedAnalysis && session.storedClaudeAnalysis) {
-    // Analysis already exists, load it
-    setAnalysisResults(session.storedAnalysis)
-    setClaudeAnalysis(session.storedClaudeAnalysis)
-    setSessionReferences(session.storedReferences || null) // ADD THIS LINE
-  } else if (session.poseData && session.poseData.length > 0) {
-    // Analysis doesn't exist, start loading animation
-    await startAnalysisWithProgress(session)
+  const handleSessionClick = async (session) => {
+    setSelectedSession(session)
+    setCurrentTime(0)
+    setOpenMenuId(null)
+    setAnalysisResults(null)
+    setClaudeAnalysis(null)
+    setSessionReferences(null) // ADD THIS LINE
+    setShowDetailedIssues(false)
+    setAnalysisProgress(0)
+    setIsLoadingAnalysis(false)
+
+    // NEW: Check if analysis is already stored for this session
+    if (session.storedAnalysis && session.storedClaudeAnalysis) {
+      // Analysis already exists, load it
+      setAnalysisResults(session.storedAnalysis)
+      setClaudeAnalysis(session.storedClaudeAnalysis)
+      setSessionReferences(session.storedReferences || null) // ADD THIS LINE
+    } else if (session.poseData && session.poseData.length > 0) {
+      // Analysis doesn't exist, start loading animation
+      await startAnalysisWithProgress(session)
+    }
   }
-}
 
   // NEW: Start analysis with animated progress
   const startAnalysisWithProgress = async (session) => {
@@ -77,7 +78,7 @@ const handleSessionClick = async (session) => {
     // Random time between 30 seconds and 2 minutes (30000ms - 120000ms)
     const randomDuration = Math.random() * (120000 - 30000) + 30000
     const startTime = Date.now()
-    
+
     // Update progress every 100ms
     progressIntervalRef.current = setInterval(() => {
       const elapsed = Date.now() - startTime
@@ -88,7 +89,7 @@ const handleSessionClick = async (session) => {
     // Perform actual analysis in background
     try {
       const config = getExerciseConfig(session.exercise_id)
-      
+
       if (!config) {
         console.error('No config for exercise:', session.exercise_id)
         clearInterval(progressIntervalRef.current)
@@ -98,9 +99,9 @@ const handleSessionClick = async (session) => {
 
       const analyzer = new SessionAnalyzer(config)
       const results = await analyzer.analyzeSession(session.poseData)
-      
+
       const aiAnalysis = await getPerformanceScore(session, results)
-      
+
       // Wait for animation to complete
       const remainingTime = randomDuration - (Date.now() - startTime)
       if (remainingTime > 0) {
@@ -110,19 +111,19 @@ const handleSessionClick = async (session) => {
       // Complete the progress
       clearInterval(progressIntervalRef.current)
       setAnalysisProgress(100)
-      
+
       // Wait a moment at 100% before showing results
       await new Promise(resolve => setTimeout(resolve, 500))
 
       // Store analysis in the session
       storeAnalysisForSession(session.id, results, aiAnalysis.analysis, aiAnalysis.references)
 
-      
+
       // Set state
-setAnalysisResults(results)
-setClaudeAnalysis(aiAnalysis.analysis)
-setSessionReferences(aiAnalysis.references || null) // ADD THIS LINE
-setIsLoadingAnalysis(false)
+      setAnalysisResults(results)
+      setClaudeAnalysis(aiAnalysis.analysis)
+      setSessionReferences(aiAnalysis.references || null) // ADD THIS LINE
+      setIsLoadingAnalysis(false)
 
     } catch (error) {
       console.error('Analysis error:', error)
@@ -133,42 +134,42 @@ setIsLoadingAnalysis(false)
   }
 
   // NEW: Store analysis results with the session in localStorage
-const storeAnalysisForSession = (sessionId, analysisResults, claudeAnalysis, references) => {
-  const stored = localStorage.getItem('recordedSessions')
-  if (stored) {
-    let allSessions = JSON.parse(stored)
-    const sessionIndex = allSessions.findIndex(s => s.id === sessionId)
-    
-    if (sessionIndex !== -1) {
-      allSessions[sessionIndex].storedAnalysis = analysisResults
-      allSessions[sessionIndex].storedClaudeAnalysis = claudeAnalysis
-      allSessions[sessionIndex].storedReferences = references  // ADD THIS LINE
-      allSessions[sessionIndex].analyzedAt = new Date().toISOString()
-      
-      localStorage.setItem('recordedSessions', JSON.stringify(allSessions))
-      setSessions(allSessions.reverse())
+  const storeAnalysisForSession = (sessionId, analysisResults, claudeAnalysis, references) => {
+    const stored = localStorage.getItem('recordedSessions')
+    if (stored) {
+      let allSessions = JSON.parse(stored)
+      const sessionIndex = allSessions.findIndex(s => s.id === sessionId)
+
+      if (sessionIndex !== -1) {
+        allSessions[sessionIndex].storedAnalysis = analysisResults
+        allSessions[sessionIndex].storedClaudeAnalysis = claudeAnalysis
+        allSessions[sessionIndex].storedReferences = references  // ADD THIS LINE
+        allSessions[sessionIndex].analyzedAt = new Date().toISOString()
+
+        localStorage.setItem('recordedSessions', JSON.stringify(allSessions))
+        setSessions(allSessions.reverse())
+      }
     }
   }
-}
 
   const handleDeleteSession = (sessionId, event) => {
     event.stopPropagation()
-    
+
     if (confirm('Delete this recording?')) {
       const stored = localStorage.getItem('recordedSessions')
       if (stored) {
         let sessions = JSON.parse(stored)
         sessions = sessions.filter(s => s.id !== sessionId)
         localStorage.setItem('recordedSessions', JSON.stringify(sessions))
-        
+
         loadSessions()
-        
+
         if (selectedSession?.id === sessionId) {
           setSelectedSession(null)
           setAnalysisResults(null)
           setClaudeAnalysis(null)
         }
-        
+
         setOpenMenuId(null)
       }
     }
@@ -250,7 +251,7 @@ const storeAnalysisForSession = (sessionId, analysisResults, claudeAnalysis, ref
       </div>
 
       <div className="content-card">
-        <button 
+        <button
           className="btn btn-secondary back-button"
           onClick={() => navigate('/')}
         >
@@ -276,8 +277,8 @@ const storeAnalysisForSession = (sessionId, analysisResults, claudeAnalysis, ref
                     key={session.id}
                     onClick={() => handleSessionClick(session)}
                     style={{
-                      background: selectedSession?.id === session.id 
-                        ? 'rgba(102, 126, 234, 0.2)' 
+                      background: selectedSession?.id === session.id
+                        ? 'rgba(102, 126, 234, 0.2)'
                         : 'rgba(255, 255, 255, 0.05)',
                       border: selectedSession?.id === session.id
                         ? '2px solid #667eea'
@@ -313,7 +314,7 @@ const storeAnalysisForSession = (sessionId, analysisResults, claudeAnalysis, ref
                       >
                         ⋮
                       </button>
-                      
+
                       {openMenuId === session.id && (
                         <div style={{
                           position: 'absolute',
@@ -372,8 +373,8 @@ const storeAnalysisForSession = (sessionId, analysisResults, claudeAnalysis, ref
                       </span>
                       {session.poseData && session.poseData.length > 0 && (
                         <span style={{
-                          background: session.storedClaudeAnalysis 
-                            ? 'rgba(16, 185, 129, 0.2)' 
+                          background: session.storedClaudeAnalysis
+                            ? 'rgba(16, 185, 129, 0.2)'
                             : 'rgba(139, 92, 246, 0.2)',
                           color: session.storedClaudeAnalysis ? '#10b981' : '#8b5cf6',
                           padding: '4px 10px',
@@ -395,7 +396,7 @@ const storeAnalysisForSession = (sessionId, analysisResults, claudeAnalysis, ref
                 <h2 style={{ marginBottom: '20px', color: '#fff', display: 'flex', alignItems: 'center', gap: '15px' }}>
                   Session Details
                 </h2>
-                
+
                 {/* Video Player */}
                 {selectedSession.videoUrl && (
                   <div style={{
@@ -527,12 +528,12 @@ const storeAnalysisForSession = (sessionId, analysisResults, claudeAnalysis, ref
                     <h3 style={{ color: '#f59e0b', marginBottom: '15px' }}>
                       ⚠️ Real-Time Warnings
                     </h3>
-                    <div className="hide-scrollbar" style={{ 
-                    display: 'flex', 
-                    flexDirection: 'column', 
-                    gap: '10px',
-                    maxHeight: '250px',
-                    overflowY: 'auto'
+                    <div className="hide-scrollbar" style={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '10px',
+                      maxHeight: '250px',
+                      overflowY: 'auto'
                     }}>
                       {selectedSession.warnings.map((warning, index) => (
                         <div
@@ -574,166 +575,171 @@ const storeAnalysisForSession = (sessionId, analysisResults, claudeAnalysis, ref
                   </div>
                 )}
 
-{/* SECTION 2: AI Performance Score */}
-{!isLoadingAnalysis && claudeAnalysis && (
-  <div style={{
-    background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.2) 0%, rgba(102, 126, 234, 0.2) 100%)',
-    border: '2px solid rgba(139, 92, 246, 0.4)',
-    borderRadius: '15px',
-    padding: '25px',
-    marginBottom: '20px'
-  }}>
-    <h3 style={{ 
-      color: '#8b5cf6', 
-      fontSize: '1.2rem', 
-      marginBottom: '20px'
-    }}>
-      🤖 AI Performance Score
-    </h3>
+                {/* SECTION 2: AI Performance Score */}
+                {!isLoadingAnalysis && claudeAnalysis && (
+                  <div style={{
+                    background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.2) 0%, rgba(102, 126, 234, 0.2) 100%)',
+                    border: '2px solid rgba(139, 92, 246, 0.4)',
+                    borderRadius: '15px',
+                    padding: '25px',
+                    marginBottom: '20px'
+                  }}>
+                    <h3 style={{
+                      color: '#8b5cf6',
+                      fontSize: '1.2rem',
+                      marginBottom: '20px'
+                    }}>
+                      🤖 AI Performance Score
+                    </h3>
 
-    {/* Big Score Display */}
-    <div style={{ display: 'flex', alignItems: 'center', gap: '25px', marginBottom: '20px' }}>
-      <div style={{
-        width: '130px',
-        height: '130px',
-        borderRadius: '50%',
-        background: `conic-gradient(${getScoreColor(claudeAnalysis.overallScore)} ${claudeAnalysis.overallScore * 3.6}deg, rgba(255, 255, 255, 0.1) 0deg)`,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        flexShrink: 0
-      }}>
-        <div style={{
-          width: '110px',
-          height: '110px',
-          borderRadius: '50%',
-          background: 'rgba(15, 12, 41, 0.95)',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center'
-        }}>
-          <div style={{
-            fontSize: '2.8rem',
-            fontWeight: '800',
-            color: getScoreColor(claudeAnalysis.overallScore),
-            lineHeight: 1
-          }}>
-            {claudeAnalysis.overallScore}
-          </div>
-          <div style={{
-            fontSize: '0.7rem',
-            color: 'rgba(255, 255, 255, 0.6)',
-            textTransform: 'uppercase',
-            marginTop: '5px'
-          }}>
-            / 100
-          </div>
-        </div>
-      </div>
+                    {/* Big Score Display */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '25px', marginBottom: '20px' }}>
+                      <div style={{
+                        width: '130px',
+                        height: '130px',
+                        borderRadius: '50%',
+                        background: `conic-gradient(${getScoreColor(claudeAnalysis.overallScore)} ${claudeAnalysis.overallScore * 3.6}deg, rgba(255, 255, 255, 0.1) 0deg)`,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        flexShrink: 0
+                      }}>
+                        <div style={{
+                          width: '110px',
+                          height: '110px',
+                          borderRadius: '50%',
+                          background: 'rgba(15, 12, 41, 0.95)',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          alignItems: 'center',
+                          justifyContent: 'center'
+                        }}>
+                          <div style={{
+                            fontSize: '2.8rem',
+                            fontWeight: '800',
+                            color: getScoreColor(claudeAnalysis.overallScore),
+                            lineHeight: 1
+                          }}>
+                            {claudeAnalysis.overallScore}
+                          </div>
+                          <div style={{
+                            fontSize: '0.7rem',
+                            color: 'rgba(255, 255, 255, 0.6)',
+                            textTransform: 'uppercase',
+                            marginTop: '5px'
+                          }}>
+                            / 100
+                          </div>
+                        </div>
+                      </div>
 
-      <div style={{ flex: 1 }}>
-        <div style={{
-          fontSize: '1.3rem',
-          fontWeight: '700',
-          color: getScoreColor(claudeAnalysis.overallScore),
-          marginBottom: '8px'
-        }}>
-          {getScoreLabel(claudeAnalysis.overallScore)} Performance
-        </div>
-        <div style={{
-          fontSize: '0.95rem',
-          color: 'rgba(255, 255, 255, 0.85)',
-          lineHeight: '1.5',
-          marginBottom: '10px'
-        }}>
-          {claudeAnalysis.summary}
-        </div>
-        <div style={{
-          fontSize: '0.85rem',
-          color: 'rgba(255, 255, 255, 0.6)'
-        }}>
-          Form Quality: <span style={{ 
-            color: '#8b5cf6',
-            fontWeight: '600',
-            textTransform: 'capitalize'
-          }}>{claudeAnalysis.formQuality}</span>
-        </div>
-      </div>
-    </div>
+                      <div style={{ flex: 1 }}>
+                        <div style={{
+                          fontSize: '1.3rem',
+                          fontWeight: '700',
+                          color: getScoreColor(claudeAnalysis.overallScore),
+                          marginBottom: '8px'
+                        }}>
+                          {getScoreLabel(claudeAnalysis.overallScore)} Performance
+                        </div>
+                        <div style={{
+                          fontSize: '0.95rem',
+                          color: 'rgba(255, 255, 255, 0.85)',
+                          lineHeight: '1.5',
+                          marginBottom: '10px'
+                        }}>
+                          {claudeAnalysis.summary}
+                        </div>
+                        <div style={{
+                          fontSize: '0.85rem',
+                          color: 'rgba(255, 255, 255, 0.6)'
+                        }}>
+                          Form Quality: <span style={{
+                            color: '#8b5cf6',
+                            fontWeight: '600',
+                            textTransform: 'capitalize'
+                          }}>{claudeAnalysis.formQuality}</span>
+                        </div>
+                      </div>
+                    </div>
 
-    {/* Strengths & Weaknesses */}
-    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '12px' }}>
-      <div style={{
-        background: 'rgba(16, 185, 129, 0.1)',
-        border: '1px solid rgba(16, 185, 129, 0.3)',
-        borderRadius: '10px',
-        padding: '12px'
-      }}>
-        <h4 style={{ color: '#10b981', fontSize: '0.9rem', marginBottom: '8px' }}>
-          ✅ Strengths
-        </h4>
-        <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '6px' }}>
-          {claudeAnalysis.strengths.slice(0, 3).map((s, i) => (
-            <li key={i} style={{ color: 'rgba(255, 255, 255, 0.9)', fontSize: '0.85rem', paddingLeft: '12px', position: 'relative' }}>
-              <span style={{ position: 'absolute', left: 0, color: '#10b981' }}>•</span>
-              {s}
-            </li>
-          ))}
-        </ul>
-      </div>
+                    {/* Strengths & Weaknesses */}
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '12px' }}>
+                      <div style={{
+                        background: 'rgba(16, 185, 129, 0.1)',
+                        border: '1px solid rgba(16, 185, 129, 0.3)',
+                        borderRadius: '10px',
+                        padding: '12px'
+                      }}>
+                        <h4 style={{ color: '#10b981', fontSize: '0.9rem', marginBottom: '8px' }}>
+                          ✅ Strengths
+                        </h4>
+                        <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                          {claudeAnalysis.strengths.slice(0, 3).map((s, i) => (
+                            <li key={i} style={{ color: 'rgba(255, 255, 255, 0.9)', fontSize: '0.85rem', paddingLeft: '12px', position: 'relative' }}>
+                              <span style={{ position: 'absolute', left: 0, color: '#10b981' }}>•</span>
+                              {s}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
 
-      <div style={{
-        background: 'rgba(239, 68, 68, 0.1)',
-        border: '1px solid rgba(239, 68, 68, 0.3)',
-        borderRadius: '10px',
-        padding: '12px'
-      }}>
-        <h4 style={{ color: '#ef4444', fontSize: '0.9rem', marginBottom: '8px' }}>
-          ⚠️ To Improve
-        </h4>
-        <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '6px' }}>
-          {claudeAnalysis.weaknesses.slice(0, 3).map((w, i) => (
-            <li key={i} style={{ color: 'rgba(255, 255, 255, 0.9)', fontSize: '0.85rem', paddingLeft: '12px', position: 'relative' }}>
-              <span style={{ position: 'absolute', left: 0, color: '#ef4444' }}>•</span>
-              {w}
-            </li>
-          ))}
-        </ul>
-      </div>
-    </div>
+                      <div style={{
+                        background: 'rgba(239, 68, 68, 0.1)',
+                        border: '1px solid rgba(239, 68, 68, 0.3)',
+                        borderRadius: '10px',
+                        padding: '12px'
+                      }}>
+                        <h4 style={{ color: '#ef4444', fontSize: '0.9rem', marginBottom: '8px' }}>
+                          ⚠️ To Improve
+                        </h4>
+                        <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                          {claudeAnalysis.weaknesses.slice(0, 3).map((w, i) => (
+                            <li key={i} style={{ color: 'rgba(255, 255, 255, 0.9)', fontSize: '0.85rem', paddingLeft: '12px', position: 'relative' }}>
+                              <span style={{ position: 'absolute', left: 0, color: '#ef4444' }}>•</span>
+                              {w}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    </div>
 
-    {/* Recommendations */}
-    <div style={{
-      background: 'rgba(59, 130, 246, 0.1)',
-      border: '1px solid rgba(59, 130, 246, 0.3)',
-      borderRadius: '10px',
-      padding: '12px',
-      marginBottom: '15px'
-    }}>
-      <h4 style={{ color: '#3b82f6', fontSize: '0.9rem', marginBottom: '8px' }}>
-        💡 Recommendations
-      </h4>
-      <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '6px' }}>
-        {claudeAnalysis.recommendations.slice(0, 3).map((r, i) => (
-          <li key={i} style={{ color: 'rgba(255, 255, 255, 0.9)', fontSize: '0.85rem', paddingLeft: '12px', position: 'relative' }}>
-            <span style={{ position: 'absolute', left: 0, color: '#3b82f6' }}>•</span>
-            {r}
-          </li>
-        ))}
-      </ul>
-    </div>
+                    {/* Recommendations */}
+                    <div style={{
+                      background: 'rgba(59, 130, 246, 0.1)',
+                      border: '1px solid rgba(59, 130, 246, 0.3)',
+                      borderRadius: '10px',
+                      padding: '12px',
+                      marginBottom: '15px'
+                    }}>
+                      <h4 style={{ color: '#3b82f6', fontSize: '0.9rem', marginBottom: '8px' }}>
+                        💡 Recommendations
+                      </h4>
+                      <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                        {claudeAnalysis.recommendations.slice(0, 3).map((r, i) => (
+                          <li key={i} style={{ color: 'rgba(255, 255, 255, 0.9)', fontSize: '0.85rem', paddingLeft: '12px', position: 'relative' }}>
+                            <span style={{ position: 'absolute', left: 0, color: '#3b82f6' }}>•</span>
+                            {r}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
 
-{/* References */}
-{sessionReferences && sessionReferences.length > 0 && (
-  <References 
-    references={sessionReferences}
-    title="📚 Clinical Research References"
-  />
-)}
+                    {/* References */}
+                    {sessionReferences && sessionReferences.length > 0 && (
+                      <References
+                        references={sessionReferences}
+                        title="📚 Clinical Research References"
+                      />
+                    )}
 
-  </div>
-)}
+                    {/* Clinical Resources */}
+                    {!isLoadingAnalysis && selectedSession && (
+                      <ClinicalResources exerciseName={selectedSession.exercise_name} />
+                    )}
+
+                  </div>
+                )}
 
                 {/* SECTION 3: AI Detected Issues */}
                 {!isLoadingAnalysis && analysisResults && analysisResults.totalIssues > 0 && (
@@ -779,9 +785,9 @@ const storeAnalysisForSession = (sessionId, analysisResults, claudeAnalysis, ref
                             opacity: filterSeverity === sev || filterSeverity === 'all' ? 1 : 0.5
                           }}
                         >
-                          <div style={{ 
-                            fontSize: '1.4rem', 
-                            fontWeight: '800', 
+                          <div style={{
+                            fontSize: '1.4rem',
+                            fontWeight: '800',
                             color: getSeverityColor(sev)
                           }}>
                             {analysisResults.summary.bySeverity[sev]}
@@ -793,7 +799,7 @@ const storeAnalysisForSession = (sessionId, analysisResults, claudeAnalysis, ref
                       ))}
                     </div>
 
-                    
+
 
                     {/* Issue List */}
                     {showDetailedIssues && (
@@ -801,19 +807,19 @@ const storeAnalysisForSession = (sessionId, analysisResults, claudeAnalysis, ref
                         <div style={{ color: 'rgba(255, 255, 255, 0.6)', fontSize: '0.8rem', marginBottom: '10px', textAlign: 'center' }}>
                           Click to jump to video
                         </div>
-                        
+
                         {filteredIssues.length === 0 ? (
                           <p style={{ color: 'rgba(255, 255, 255, 0.7)', textAlign: 'center', padding: '15px' }}>
                             No {filterSeverity !== 'all' ? filterSeverity : ''} issues
                           </p>
                         ) : (
-                         <div className="hide-scrollbar" style={{ 
-                            display: 'flex', 
-                            flexDirection: 'column', 
+                          <div className="hide-scrollbar" style={{
+                            display: 'flex',
+                            flexDirection: 'column',
                             gap: '8px',
                             maxHeight: '350px',
                             overflowY: 'auto'
-                            }}>
+                          }}>
                             {filteredIssues.map((issue, index) => (
                               <div
                                 key={index}
@@ -908,7 +914,7 @@ const storeAnalysisForSession = (sessionId, analysisResults, claudeAnalysis, ref
           scrollbar-width: none;  /* Firefox */
         }
       `}</style>
-    </div>
+    </div >
   )
 }
 

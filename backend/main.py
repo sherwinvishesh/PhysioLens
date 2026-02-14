@@ -7,6 +7,7 @@ import os
 import base64
 from dotenv import load_dotenv
 import xml.etree.ElementTree as ET
+from services.brightdata_service import BrightDataService
 
 load_dotenv()
 
@@ -596,3 +597,19 @@ def get_exercise_config(exercise_id: int):
             return {"config": exercise.get("config")}
     
     raise HTTPException(status_code=404, detail="Exercise configuration not found")
+
+@app.post("/api/research/resources")
+async def get_clinical_resources(request: dict):
+    """Search for clinical resources (NICE, NHS, CSP)"""
+    query = request.get("query")
+    if not query:
+        raise HTTPException(status_code=400, detail="Query parameter required")
+    
+    try:
+        service = BrightDataService()
+        results = await service.search_clinical_resources(query)
+        return {"resources": results}
+    except Exception as e:
+        print(f"Error fetching resources: {e}")
+        # Return empty list on error to avoid breaking frontend
+        return {"resources": [], "error": str(e)}
