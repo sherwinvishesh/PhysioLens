@@ -168,6 +168,7 @@ pip install -r requirements.txt --break-system-packages
 4. Create `.env` file:
 ```env
 ANTHROPIC_API_KEY=your_claude_api_key_here
+BRIGHTDATA_WS_ENDPOINT=your_brightdata_endpoint
 BRIGHTDATA_API_TOKEN=your_brightdata_token_here  
 ```
 
