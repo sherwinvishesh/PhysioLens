@@ -787,9 +787,9 @@
 /* Footer Grid */
 .landing-footer-grid {
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: 4fr;
   gap: 3rem;
-  margin-bottom: 2rem;
+  margin-bottom: 3crem;
   text-align: left;
 }
 
@@ -801,10 +801,10 @@
 
 @media (min-width: 1024px) {
   .landing-footer-grid {
-    /* Brand (auto) | Spacer (1fr) | Resources | Company */
-    grid-template-columns: auto 1fr auto auto;
+    /* Brand (1.5 parts) | Resources (1 part) | Company (1 part) */
+    grid-template-columns: 1.5fr 1fr 1fr;
     align-items: start;
-    gap: 6rem;
+    gap: 2rem;
   }
 }
 
@@ -907,10 +907,10 @@
 /* Bottom Bar */
 .landing-footer-bottom-bar {
   border-top: 1px solid rgba(255, 255, 255, 0.1);
-  padding-top: 1rem;
+  padding-top: 2rem;
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 2rem;
 }
 
 @media (min-width: 768px) {
