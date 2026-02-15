@@ -669,10 +669,10 @@ function LandingPage() {
                   <span className="cost-high">$100-200</span>
                 </div>
                 <div className="comparison-cell competitor-cell">
-                  <span className="cost-medium">$20-50</span>
+                  <span className="cost-medium">$10-$15</span>
                 </div>
                 <div className="comparison-cell physiolens-cell">
-                  <span className="cost-low">$10-15</span>
+                  <span className="cost-low">$0.01</span>
                 </div>
               </div>
             </div>
