@@ -91,6 +91,31 @@ function DoctorView() {
     setTargetReps({})
   }
 
+  const [activeFilter, setActiveFilter] = useState('All')
+
+  // Filter Logic
+  const filteredExercises = exercises.filter(exercise => {
+    if (activeFilter === 'All') return true
+
+    // Define lower body keywords/names
+    const lowerBodyTerms = ['Leg', 'Squat', 'Sqaut', 'Lunge', 'Calf']
+    const isLowerBody = lowerBodyTerms.some(term =>
+      exercise.name.toLowerCase().includes(term.toLowerCase())
+    )
+
+    if (activeFilter === 'Lower Body') {
+      return isLowerBody
+    }
+
+    if (activeFilter === 'Upper Body') {
+      return !isLowerBody
+    }
+
+    return true
+  })
+
+  const filters = ['All', 'Upper Body', 'Lower Body']
+
   if (loading) {
     return (
       <div className="doctor-page">
@@ -105,6 +130,19 @@ function DoctorView() {
   return (
     <div className="doctor-page">
       <div className="doctor-bg" />
+
+      {/* Back Button */}
+      <div className="back-nav">
+        <button
+          className="btn-back"
+          onClick={() => navigate('/')}
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M19 12H5" /><path d="M12 19l-7-7 7-7" />
+          </svg>
+          Back to Home
+        </button>
+      </div>
 
       <div className="doctor-container">
         {/* Header Section */}
@@ -141,10 +179,15 @@ function DoctorView() {
 
           <div className="doctor-controls delay-100 animate-enter">
             <div className="doctor-filters">
-              <button className="doctor-filter-btn active">All Exercises</button>
-              <button className="doctor-filter-btn">Strength</button>
-              <button className="doctor-filter-btn">Mobility</button>
-              <button className="doctor-filter-btn">Balance</button>
+              {filters.map(filterName => (
+                <button
+                  key={filterName}
+                  className={`doctor-filter-btn ${activeFilter === filterName ? 'active' : ''}`}
+                  onClick={() => setActiveFilter(filterName)}
+                >
+                  {filterName === 'All' ? 'All Exercises' : filterName}
+                </button>
+              ))}
             </div>
 
             <button className="doctor-action-secondary" onClick={() => navigate('/add-exercise')}>
@@ -155,7 +198,7 @@ function DoctorView() {
 
         {/* Grid Section */}
         <div className="doctor-grid delay-200 animate-enter">
-          {exercises.map(exercise => {
+          {filteredExercises.map(exercise => {
             const isSelected = selectedExercises.includes(exercise.id)
             return (
               <div
@@ -171,7 +214,7 @@ function DoctorView() {
                       </span>
                       {exercise.config && (
                         <span className="doctor-badge">
-                          AI Generated
+                          AI
                         </span>
                       )}
                     </div>

@@ -1,365 +1,423 @@
-/* Add Exercise Page Styles */
+/* Add Exercise - Premium Polish */
+@import url('https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap');
 
-.add-exercise-form {
-  max-width: 800px;
+:root {
+  --bg-dark: #0a0a0a;
+  --card-bg: rgba(255, 255, 255, 0.05);
+  --card-border: rgba(255, 255, 255, 0.1);
+  --card-hover: rgba(255, 255, 255, 0.1);
+  --text-primary: rgba(255, 255, 255, 0.9);
+  --text-secondary: rgba(255, 255, 255, 0.7);
+  --text-tertiary: rgba(255, 255, 255, 0.5);
+  --accent: #fff;
+  --primary-glow: rgba(102, 126, 234, 0.5);
+}
+
+/* Base Layout */
+.doctor-page {
+  min-height: 100vh;
+  background-color: var(--bg-dark);
+  font-family: 'Geist', 'Inter', sans-serif;
+  color: var(--text-primary);
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* Background Gradients/Blur */
+.doctor-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 15% 50%, rgba(255, 255, 255, 0.03), transparent 25%),
+    radial-gradient(circle at 85% 30%, rgba(255, 255, 255, 0.02), transparent 25%);
+}
+
+.doctor-container {
+  position: relative;
+  z-index: 10;
+  max-width: 48rem;
+  /* Narrower for better focus */
+  margin: 0 auto;
+  padding: 4rem 1.5rem;
+}
+
+/* Header Section */
+.doctor-header {
+  text-align: center;
+  margin-bottom: 3rem;
+  animation: fadeSlideIn 0.8s ease-out forwards;
+}
+
+.doctor-title {
+  font-size: clamp(2.5rem, 5vw, 4rem);
+  font-weight: 600;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  color: white;
+  margin-bottom: 1rem;
+}
+
+.doctor-subtitle {
+  font-size: 1.125rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
+  max-width: 32rem;
   margin: 0 auto;
 }
 
-.form-section {
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 15px;
-  padding: 30px;
-  margin-bottom: 30px;
+/* Back Button */
+.back-nav {
+  position: absolute;
+  top: 2rem;
+  left: 2rem;
+  z-index: 20;
 }
 
-.form-section h2 {
-  color: #00FF88;
-  font-size: 1.4rem;
-  margin-bottom: 10px;
+.btn-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--card-border);
+  border-radius: 9999px;
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  backdrop-filter: blur(10px);
 }
 
-.section-description {
-  color: rgba(255, 255, 255, 0.7);
-  font-size: 0.95rem;
-  margin-bottom: 20px;
+.btn-back:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Form Card */
+.form-card {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 1.5rem;
+  padding: 2.5rem;
+  /* Increased padding */
+  backdrop-filter: blur(20px);
+  margin-bottom: 2rem;
+  animation: fadeSlideIn 0.8s ease-out 0.2s forwards;
+  opacity: 0;
+  text-align: center;
+  /* Center content in cards */
+}
+
+.form-section-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: white;
+  /* Changed from green to white */
+  margin-bottom: 2rem;
+  letter-spacing: -0.02em;
+  text-align: center;
+  /* Explicitly center titles */
 }
 
 .form-group {
-  margin-bottom: 25px;
+  margin-bottom: 2rem;
+  text-align: left;
+  /* Keep inputs left-aligned for readability */
 }
 
-.form-group label {
+.form-label {
   display: block;
-  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.875rem;
   font-weight: 600;
-  margin-bottom: 10px;
-  font-size: 1rem;
+  color: white;
+  margin-bottom: 0.75rem;
+  letter-spacing: 0.02em;
 }
 
 .form-input,
 .form-textarea {
   width: 100%;
-  padding: 14px 18px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 2px solid rgba(255, 255, 255, 0.2);
-  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--card-border);
+  border-radius: 0.75rem;
+  padding: 1rem;
   color: white;
-  font-size: 1rem;
   font-family: inherit;
-  transition: all 0.3s ease;
+  font-size: 1rem;
+  transition: all 0.2s ease;
 }
 
 .form-input:focus,
 .form-textarea:focus {
   outline: none;
-  border-color: #667eea;
-  background: rgba(102, 126, 234, 0.1);
-  box-shadow: 0 0 20px rgba(102, 126, 234, 0.2);
+  background: rgba(255, 255, 255, 0.08);
+  /* Slightly lighter on focus */
+  border-color: rgba(255, 255, 255, 0.3);
+  box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.05);
 }
 
 .form-input::placeholder,
 .form-textarea::placeholder {
-  color: rgba(255, 255, 255, 0.4);
-}
-
-.form-textarea {
-  resize: vertical;
-  min-height: 120px;
-  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.3);
 }
 
 .char-count {
   text-align: right;
-  color: rgba(255, 255, 255, 0.5);
-  font-size: 0.85rem;
-  margin-top: 8px;
+  font-size: 0.75rem;
+  color: var(--text-tertiary);
+  margin-top: 0.5rem;
 }
 
-/* Image Upload */
-.image-upload-area {
-  border: 3px dashed rgba(255, 255, 255, 0.2);
-  border-radius: 15px;
-  padding: 50px;
+/* specialized file upload */
+.upload-area {
+  border: 2px dashed var(--card-border);
+  border-radius: 1rem;
+  padding: 3rem;
   text-align: center;
-  transition: all 0.3s ease;
   cursor: pointer;
+  transition: all 0.2s;
   background: rgba(255, 255, 255, 0.02);
 }
 
-.image-upload-area:hover {
-  border-color: #667eea;
-  background: rgba(102, 126, 234, 0.05);
-}
-
-.upload-label {
-  cursor: pointer;
-  display: block;
+.upload-area:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.3);
 }
 
 .upload-icon {
-  font-size: 4rem;
-  margin-bottom: 15px;
-  opacity: 0.6;
+  font-size: 2rem;
+  margin-bottom: 1rem;
+  opacity: 0.8;
 }
 
 .upload-text {
+  font-weight: 500;
   color: white;
-  font-size: 1.2rem;
-  font-weight: 600;
-  margin-bottom: 8px;
+  margin-bottom: 0.5rem;
 }
 
 .upload-hint {
-  color: rgba(255, 255, 255, 0.5);
-  font-size: 0.9rem;
+  font-size: 0.875rem;
+  color: var(--text-tertiary);
 }
 
+/* Image Preview */
 .image-preview-container {
   position: relative;
-  max-width: 500px;
-  margin: 0 auto;
+  border-radius: 1rem;
+  overflow: hidden;
+  border: 1px solid var(--card-border);
 }
 
 .image-preview {
   width: 100%;
-  height: auto;
-  border-radius: 15px;
-  border: 2px solid rgba(102, 126, 234, 0.3);
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+  height: 300px;
+  object-fit: cover;
 }
 
 .remove-image-btn {
-  margin-top: 15px;
-  padding: 10px 20px;
-  background: rgba(239, 68, 68, 0.2);
-  border: 1px solid rgba(239, 68, 68, 0.4);
-  color: #ef4444;
-  border-radius: 8px;
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 0.5rem 1rem;
+  border-radius: 9999px;
+  font-size: 0.875rem;
   cursor: pointer;
-  font-size: 0.95rem;
-  font-weight: 600;
-  transition: all 0.3s ease;
+  transition: all 0.2s;
 }
 
 .remove-image-btn:hover {
-  background: rgba(239, 68, 68, 0.3);
-  transform: translateY(-2px);
+  background: rgba(0, 0, 0, 0.8);
+  border-color: white;
 }
 
-/* Form Actions */
+/* Action Buttons */
 .form-actions {
   display: flex;
-  gap: 20px;
-  justify-content: center;
-  margin-top: 40px;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 2rem;
 }
 
-.btn-large {
-  padding: 16px 40px;
-  font-size: 1.1rem;
+.doctor-page .btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1.25rem;
+  border-radius: 9999px;
+  font-weight: 600;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: transform 0.1s, background 0.2s, color 0.2s;
+  min-width: 120px;
+  border: none;
+  box-shadow: none;
+  /* Override App.css */
+}
+
+/* Secondary Button (Cancel / Create Another) */
+.doctor-page .btn-secondary {
+  background: transparent;
+  border: 1px solid var(--card-border);
+  color: var(--text-secondary);
+}
+
+.doctor-page .btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: white;
+  border-color: rgba(255, 255, 255, 0.2);
+  transform: none;
+  /* Override hover translateY from App.css if needed, or allow it. DoctorView uses scale or color change. */
+}
+
+/* Primary Button (Submit) */
+.doctor-page .btn-primary {
+  background: white;
+  color: black;
+  border: 1px solid white;
+  box-shadow: none;
+  /* Override App.css */
+}
+
+.doctor-page .btn-primary:hover {
+  transform: scale(1.02);
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: none;
+}
+
+.doctor-page .btn-primary:active {
+  transform: scale(0.98);
+}
+
+.doctor-page .btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
 }
 
 /* Loading State */
-.creation-loading {
-  max-width: 600px;
-  margin: 40px auto;
-  padding: 40px;
+.loading-container {
   text-align: center;
+  padding: 4rem 2rem;
+  color: white;
 }
 
-.loading-animation h2 {
-  color: #667eea;
+.loading-circle {
+  position: relative;
+  width: 200px;
+  height: 200px;
+  margin: 0 auto 2.5rem;
+}
+
+.loading-text {
   font-size: 1.5rem;
-  margin-bottom: 30px;
+  font-weight: 600;
+  color: white;
+  /* Changed from purple to white */
+  margin-bottom: 1rem;
 }
 
 .loading-steps {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-  margin-top: 30px;
-  text-align: left;
   max-width: 400px;
-  margin-left: auto;
-  margin-right: auto;
+  margin: 0 auto;
+  text-align: left;
 }
 
-.loading-step {
+.loading-step-item {
   display: flex;
   align-items: center;
-  gap: 15px;
-  padding: 15px 20px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 10px;
-  color: rgba(255, 255, 255, 0.9);
-  font-size: 1rem;
+  gap: 1rem;
+  padding: 0.75rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  opacity: 0;
+  animation: fadeIn 0.5s ease forwards;
 }
 
-.step-icon {
-  font-size: 1.5rem;
-  flex-shrink: 0;
-  width: 40px;
+.loading-step-item:nth-child(1) {
+  animation-delay: 0.2s;
+}
+
+.loading-step-item:nth-child(2) {
+  animation-delay: 1.2s;
+}
+
+.loading-step-item:nth-child(3) {
+  animation-delay: 2.2s;
+}
+
+.loading-step-item:nth-child(4) {
+  animation-delay: 3.2s;
+}
+
+.loading-step-item:nth-child(5) {
+  animation-delay: 4.2s;
+}
+
+/* Animations */
+@keyframes fadeSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+    filter: blur(5px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+/* Success State */
+.success-container {
+  max-width: 40rem;
+  background: #0a0a0a;
+  border: 1px solid var(--card-border);
+  border-radius: 2rem;
+  padding: 3rem;
   text-align: center;
-}
-
-/* Success Card */
-.success-card {
-  background: linear-gradient(135deg, rgba(15, 12, 41, 0.98) 0%, rgba(48, 43, 99, 0.98) 100%);
-  border: 2px solid rgba(102, 126, 234, 0.4);
-  border-radius: 30px;
-  padding: 50px 60px;
-  max-width: 700px;
-  width: 90vw;
-  max-height: 90vh;
-  overflow-y: auto;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  position: relative;
+  z-index: 50;
+  box-shadow: 0 20px 50px -10px rgba(0, 0, 0, 0.5);
 }
 
 .success-icon {
-  font-size: 5rem;
-  margin-bottom: 20px;
-  animation: bounceIn 0.6s ease;
+  font-size: 4rem;
+  margin-bottom: 1.5rem;
+  animation: bounce 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
-@keyframes bounceIn {
+@keyframes bounce {
   0% {
     transform: scale(0);
+    opacity: 0;
   }
-  50% {
+
+  60% {
     transform: scale(1.1);
   }
+
   100% {
     transform: scale(1);
+    opacity: 1;
   }
-}
-
-.success-card h1 {
-  color: white;
-  font-size: 2rem;
-  margin-bottom: 30px;
-}
-
-.created-exercise-summary {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 15px;
-  padding: 30px;
-  margin-bottom: 30px;
-  text-align: left;
-}
-
-.created-exercise-summary h2 {
-  color: #00FF88;
-  font-size: 1.8rem;
-  margin-bottom: 15px;
-}
-
-.exercise-desc {
-  color: rgba(255, 255, 255, 0.8);
-  font-size: 1.1rem;
-  line-height: 1.6;
-  margin-bottom: 25px;
-}
-
-.exercise-meta-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 15px;
-  margin-bottom: 25px;
-}
-
-.meta-item {
-  background: rgba(102, 126, 234, 0.1);
-  border: 1px solid rgba(102, 126, 234, 0.3);
-  border-radius: 10px;
-  padding: 12px;
-  text-align: center;
-}
-
-.meta-label {
-  display: block;
-  color: rgba(255, 255, 255, 0.6);
-  font-size: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin-bottom: 5px;
-}
-
-.meta-value {
-  display: block;
-  color: white;
-  font-size: 1rem;
-  font-weight: 700;
-  text-transform: capitalize;
-}
-
-.instructions-preview {
-  margin-top: 20px;
-}
-
-.instructions-preview h3 {
-  color: #667eea;
-  font-size: 1.2rem;
-  margin-bottom: 15px;
-}
-
-.instructions-preview ol {
-  padding-left: 25px;
-  color: rgba(255, 255, 255, 0.9);
-  line-height: 1.8;
-}
-
-.instructions-preview li {
-  margin-bottom: 8px;
-}
-
-.success-actions {
-  display: flex;
-  gap: 15px;
-  justify-content: center;
-  flex-wrap: wrap;
-}
-
-/* Responsive Design */
-@media (max-width: 768px) {
-  .form-section {
-    padding: 20px;
-  }
-
-  .success-card {
-    padding: 30px 25px;
-  }
-
-  .exercise-meta-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .form-actions {
-    flex-direction: column;
-  }
-
-  .btn-large {
-    width: 100%;
-  }
-}
-
-/* Scrollbar styling for success card */
-.success-card::-webkit-scrollbar {
-  width: 8px;
-}
-
-.success-card::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 10px;
-}
-
-.success-card::-webkit-scrollbar-thumb {
-  background: rgba(102, 126, 234, 0.5);
-  border-radius: 10px;
-}
-
-.success-card::-webkit-scrollbar-thumb:hover {
-  background: rgba(102, 126, 234, 0.7);
 }
