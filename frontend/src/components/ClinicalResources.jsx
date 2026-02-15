@@ -1,10 +1,18 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 function ClinicalResources({ exerciseName }) {
     const [resources, setResources] = useState([])
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState(null)
     const [loaded, setLoaded] = useState(false)
+
+    // Reset state when exerciseName changes
+    useEffect(() => {
+        setResources([])
+        setLoaded(false)
+        setError(null)
+        setLoading(false)
+    }, [exerciseName])
 
     const fetchResources = async () => {
         setLoading(true)
@@ -30,38 +38,12 @@ function ClinicalResources({ exerciseName }) {
         }
     }
 
-    const getSourceColor = (source) => {
-        switch (source) {
-            case 'NICE': return '#005eb8' // NHS Blue-ish
-            case 'NHS': return '#005eb8'
-            case 'CSP': return '#e40046' // CSP Red-ish
-            default: return '#6b7280'
-        }
-    }
-
     if (!loaded && !loading) {
         return (
-            <div style={{
-                marginTop: '20px',
-                textAlign: 'center'
-            }}>
+            <div className="cr-empty-state">
                 <button
                     onClick={fetchResources}
-                    className="btn"
-                    style={{
-                        background: 'linear-gradient(135deg, #005eb8 0%, #003087 100%)',
-                        color: 'white',
-                        border: 'none',
-                        padding: '12px 24px',
-                        borderRadius: '8px',
-                        fontSize: '1rem',
-                        fontWeight: '600',
-                        cursor: 'pointer',
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        gap: '8px',
-                        boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
-                    }}
+                    className="cr-find-btn"
                 >
                     <span>🏥</span> Find Accredited Clinical Resources
                 </button>
@@ -73,27 +55,22 @@ function ClinicalResources({ exerciseName }) {
     }
 
     return (
-        <div style={{
-            background: 'rgba(0, 94, 184, 0.1)', // Light blue tint
-            border: '2px solid rgba(0, 94, 184, 0.3)',
-            borderRadius: '12px',
-            padding: '20px',
-            marginTop: '20px'
-        }}>
-            <h3 style={{
-                color: '#60a5fa',
-                fontSize: '1.1rem',
-                marginBottom: '15px',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '10px'
-            }}>
+        <div className="cr-container">
+            <h3 className="cr-header">
                 🏥 Clinical Resources & Guidelines
             </h3>
 
             {loading && (
                 <div style={{ textAlign: 'center', padding: '20px', color: 'rgba(255, 255, 255, 0.7)' }}>
-                    <div className="loading-spinner" style={{ margin: '0 auto 10px', width: '24px', height: '24px', border: '3px solid rgba(255,255,255,0.1)', borderTopColor: '#60a5fa' }}></div>
+                    <div style={{
+                        margin: '0 auto 10px',
+                        width: '24px',
+                        height: '24px',
+                        border: '3px solid rgba(255,255,255,0.1)',
+                        borderTopColor: '#ffffff',
+                        borderRadius: '50%',
+                        animation: 'spin 1s linear infinite'
+                    }}></div>
                     Searching accredited sources...
                 </div>
             )}
@@ -110,82 +87,42 @@ function ClinicalResources({ exerciseName }) {
                 </div>
             )}
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            <div className="cr-list">
                 {resources.map((res, index) => (
                     <a
                         key={index}
                         href={res.url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        style={{
-                            background: 'rgba(255, 255, 255, 0.05)',
-                            border: `1px solid ${getSourceColor(res.source)}40`, // 40 = 25% opacity hex
-                            borderRadius: '8px',
-                            padding: '12px 15px',
-                            textDecoration: 'none',
-                            color: 'white',
-                            transition: 'all 0.2s ease',
-                            display: 'block',
-                            position: 'relative',
-                            overflow: 'hidden'
-                        }}
-                        onMouseEnter={(e) => {
-                            e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)'
-                            e.currentTarget.style.transform = 'translateX(5px)'
-                        }}
-                        onMouseLeave={(e) => {
-                            e.currentTarget.style.background = 'rgba(255, 255, 255, 0.05)'
-                            e.currentTarget.style.transform = 'translateX(0)'
-                        }}
+                        className="cr-item"
                     >
                         {/* Source Badge */}
-                        <div style={{
-                            position: 'absolute',
-                            top: '12px',
-                            right: '12px',
-                            background: getSourceColor(res.source),
-                            color: 'white',
-                            fontSize: '0.7rem',
-                            fontWeight: 'bold',
-                            padding: '2px 8px',
-                            borderRadius: '4px'
-                        }}>
+                        <div className="cr-badge">
                             {res.source}
                         </div>
 
-                        <div style={{
-                            fontWeight: '600',
-                            marginBottom: '5px',
-                            color: '#fff',
-                            fontSize: '0.95rem',
-                            lineHeight: '1.4',
-                            paddingRight: '60px' // Space for badge
-                        }}>
+                        <div className="cr-title">
                             {res.title}
                         </div>
 
                         {res.summary && (
-                            <div style={{
-                                fontSize: '0.85rem',
-                                color: 'rgba(255, 255, 255, 0.7)',
-                                marginBottom: '8px',
-                                lineHeight: '1.4'
-                            }}>
+                            <div className="cr-summary">
                                 {res.summary}
                             </div>
                         )}
 
-                        <div style={{
-                            fontSize: '0.75rem',
-                            color: getSourceColor(res.source),
-                            marginTop: '5px',
-                            fontWeight: '500'
-                        }}>
+                        <div className="cr-link">
                             🔗 Visit {res.source} →
                         </div>
                     </a>
                 ))}
             </div>
+            <style>{`
+                @keyframes spin {
+                    0% { transform: rotate(0deg); }
+                    100% { transform: rotate(360deg); }
+                }
+            `}</style>
         </div>
     )
 }
