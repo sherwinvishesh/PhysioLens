@@ -8,7 +8,7 @@ export function MeetingModeProvider({ children }) {
   const [enabled, setEnabled] = useState(false)
   const [isRecording, setIsRecording] = useState(false)
   const [currentTranscript, setCurrentTranscript] = useState('')
-  
+
   const recognitionRef = useRef(null)
   const fullTranscriptRef = useRef('')
   const sessionStartTimeRef = useRef(null)
@@ -18,10 +18,10 @@ export function MeetingModeProvider({ children }) {
   // AUTO-START recording when enabled toggles ON
   useEffect(() => {
     if (enabled && !isRecording) {
-      console.log('🎤 Meeting Mode enabled - starting voice recording')
+      console.log(' Meeting Mode enabled - starting voice recording')
       startVoiceRecording()
     } else if (!enabled && isRecording) {
-      console.log('🛑 Meeting Mode disabled - stopping voice recording')
+      console.log(' Meeting Mode disabled - stopping voice recording')
       stopVoiceRecording()
     }
   }, [enabled])
@@ -51,13 +51,13 @@ export function MeetingModeProvider({ children }) {
       recognition.onresult = (event) => {
         const result = event.results[event.results.length - 1]
         const transcript = result[0].transcript
-        
+
         // Only process final results (not interim)
         if (result.isFinal) {
           console.log('📝 Transcript:', transcript)
           fullTranscriptRef.current += ' ' + transcript
           setCurrentTranscript(fullTranscriptRef.current)
-          
+
           // Analyze for emergency/meeting
           analyzeTranscriptChunk(transcript)
         }
@@ -92,7 +92,7 @@ export function MeetingModeProvider({ children }) {
       recognitionRef.current = recognition
       recognition.start()
       return true
-      
+
     } catch (error) {
       console.error('Error starting voice recognition:', error)
       alert('Could not start voice recognition: ' + error.message)
@@ -143,7 +143,7 @@ export function MeetingModeProvider({ children }) {
 
         if (response.ok) {
           const analysis = await response.json()
-          
+
           // EMERGENCY - instant popup
           if (analysis.emergency && analysis.urgency_score >= 7) {
             detectedEmergenciesRef.current.push({
@@ -159,8 +159,8 @@ export function MeetingModeProvider({ children }) {
               ...analysis.meeting_details,
               timestamp: Date.now()
             })
-            window.dispatchEvent(new CustomEvent('meeting-detected', { 
-              detail: analysis.meeting_details 
+            window.dispatchEvent(new CustomEvent('meeting-detected', {
+              detail: analysis.meeting_details
             }))
           }
         }
@@ -173,19 +173,19 @@ export function MeetingModeProvider({ children }) {
   // Generate full clinical summary (called when session ends)
   const generateClinicalSummary = async (sessionContext = {}) => {
     const fullTranscript = fullTranscriptRef.current.trim()
-    
+
     if (!fullTranscript || fullTranscript.length < 50) {
       console.warn('Transcript too short for summary generation')
       return null
     }
 
-    const duration = sessionStartTimeRef.current 
+    const duration = sessionStartTimeRef.current
       ? Math.floor((Date.now() - sessionStartTimeRef.current) / 1000)
       : 0
 
     try {
       console.log('🔄 Generating clinical summary with Claude...')
-      
+
       const response = await fetch('http://localhost:8000/api/meeting-mode/generate-summary', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -215,7 +215,7 @@ export function MeetingModeProvider({ children }) {
   const getSessionData = () => {
     return {
       transcript: fullTranscriptRef.current.trim(),
-      duration: sessionStartTimeRef.current 
+      duration: sessionStartTimeRef.current
         ? Math.floor((Date.now() - sessionStartTimeRef.current) / 1000)
         : 0,
       detectedMeetings: detectedMeetingsRef.current,
@@ -230,92 +230,92 @@ export function MeetingModeProvider({ children }) {
     detectedEmergenciesRef.current = []
     setCurrentTranscript('')
   }
-// NEW: Stop recording and generate summary
-const stopAndSummarize = async () => {
-  const fullTranscript = fullTranscriptRef.current.trim()
-  
-  if (fullTranscript.length < 50) {
-    alert('Recording too short to generate summary (need at least 50 characters)')
-    setEnabled(false)
-    return null
-  }
+  // NEW: Stop recording and generate summary
+  const stopAndSummarize = async () => {
+    const fullTranscript = fullTranscriptRef.current.trim()
 
-  const duration = sessionStartTimeRef.current 
-    ? Math.floor((Date.now() - sessionStartTimeRef.current) / 1000)
-    : 0
-
-  console.log('🔄 Generating clinical summary...')
-  
-  try {
-    const response = await fetch('http://localhost:8000/api/meeting-mode/generate-summary', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        transcript: fullTranscript,
-        duration: duration,
-        detectedMeetings: detectedMeetingsRef.current,
-        detectedEmergencies: detectedEmergenciesRef.current,
-        sessionContext: {
-          source: 'manual_recording',
-          timestamp: new Date().toISOString()
-        }
-      })
-    })
-
-    if (response.ok) {
-      const summary = await response.json()
-      console.log('✅ Summary generated:', summary)
-      
-      // Save to clinical notes
-      const clinicalNotes = JSON.parse(localStorage.getItem('clinicalNotes') || '[]')
-      clinicalNotes.push({
-        id: Date.now(),
-        exercise_name: 'Voice Recording Session',
-        date: new Date().toISOString(),
-        summary: summary,
-        rep_count: 0,
-        target_reps: 0,
-        duration: duration,
-        sessionData: {
-          transcript: fullTranscript,
-          duration: duration,
-          detectedMeetings: detectedMeetingsRef.current,
-          detectedEmergencies: detectedEmergenciesRef.current
-        }
-      })
-      localStorage.setItem('clinicalNotes', JSON.stringify(clinicalNotes))
-      
-      alert('✅ Clinical summary generated and saved!')
-      
-      // Stop recording after summary is saved
-      setEnabled(false)
-      resetSession()
-      
-      return summary
-    } else {
-      console.error('Failed to generate summary')
-      alert('⚠️ Failed to generate summary')
+    if (fullTranscript.length < 50) {
+      alert('Recording too short to generate summary (need at least 50 characters)')
       setEnabled(false)
       return null
     }
-  } catch (error) {
-    console.error('Error generating summary:', error)
-    alert('⚠️ Error generating summary: ' + error.message)
-    setEnabled(false)
-    return null
-  }
-}
 
-const value = {
-  enabled,
-  setEnabled,
-  isRecording,
-  currentTranscript,
-  generateClinicalSummary,
-  getSessionData,
-  resetSession,
-  stopAndSummarize  // ADD THIS
-}
+    const duration = sessionStartTimeRef.current
+      ? Math.floor((Date.now() - sessionStartTimeRef.current) / 1000)
+      : 0
+
+    console.log('🔄 Generating clinical summary...')
+
+    try {
+      const response = await fetch('http://localhost:8000/api/meeting-mode/generate-summary', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          transcript: fullTranscript,
+          duration: duration,
+          detectedMeetings: detectedMeetingsRef.current,
+          detectedEmergencies: detectedEmergenciesRef.current,
+          sessionContext: {
+            source: 'manual_recording',
+            timestamp: new Date().toISOString()
+          }
+        })
+      })
+
+      if (response.ok) {
+        const summary = await response.json()
+        console.log('✅ Summary generated:', summary)
+
+        // Save to clinical notes
+        const clinicalNotes = JSON.parse(localStorage.getItem('clinicalNotes') || '[]')
+        clinicalNotes.push({
+          id: Date.now(),
+          exercise_name: 'Voice Recording Session',
+          date: new Date().toISOString(),
+          summary: summary,
+          rep_count: 0,
+          target_reps: 0,
+          duration: duration,
+          sessionData: {
+            transcript: fullTranscript,
+            duration: duration,
+            detectedMeetings: detectedMeetingsRef.current,
+            detectedEmergencies: detectedEmergenciesRef.current
+          }
+        })
+        localStorage.setItem('clinicalNotes', JSON.stringify(clinicalNotes))
+
+        alert('✅ Clinical summary generated and saved!')
+
+        // Stop recording after summary is saved
+        setEnabled(false)
+        resetSession()
+
+        return summary
+      } else {
+        console.error('Failed to generate summary')
+        alert('⚠️ Failed to generate summary')
+        setEnabled(false)
+        return null
+      }
+    } catch (error) {
+      console.error('Error generating summary:', error)
+      alert('⚠️ Error generating summary: ' + error.message)
+      setEnabled(false)
+      return null
+    }
+  }
+
+  const value = {
+    enabled,
+    setEnabled,
+    isRecording,
+    currentTranscript,
+    generateClinicalSummary,
+    getSessionData,
+    resetSession,
+    stopAndSummarize  // ADD THIS
+  }
 
   return (
     <MeetingModeContext.Provider value={value}>

@@ -1,0 +1,685 @@
+/* Session History - Premium Monochrome Theme */
+@import url('https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap');
+
+:root {
+    --sh-bg: #0a0a0a;
+    --sh-card-bg: rgba(255, 255, 255, 0.05);
+    --sh-card-border: rgba(255, 255, 255, 0.1);
+    --sh-text-primary: #ffffff;
+    --sh-text-secondary: rgba(255, 255, 255, 0.7);
+    --sh-text-tertiary: rgba(255, 255, 255, 0.5);
+    --sh-accent: #ffffff;
+}
+
+.session-history-container {
+    min-height: 100vh;
+    background-color: var(--sh-bg);
+    color: var(--sh-text-primary);
+    font-family: 'Geist', 'Inter', sans-serif;
+    padding: 40px;
+}
+
+/* Header */
+.session-header {
+    margin-bottom: 40px;
+    border-bottom: 1px solid var(--sh-card-border);
+    padding-bottom: 20px;
+}
+
+.session-header h1 {
+    font-family: 'Geist', 'Inter', sans-serif;
+    font-size: clamp(2.5rem, 5vw, 4.5rem);
+    font-weight: 600;
+    letter-spacing: -0.04em;
+    line-height: 1;
+    margin: 0 0 1.5rem 0;
+    color: var(--sh-text-primary);
+    max-width: 40rem;
+}
+
+.session-header p {
+    color: var(--sh-text-secondary);
+    margin: 0;
+    font-size: 1.1rem;
+}
+
+.back-button {
+    background-color: var(--sh-card-bg);
+    color: var(--sh-text-primary);
+    border: 1px solid var(--sh-card-border);
+    padding: 10px 20px;
+    border-radius: 9999px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-bottom: 30px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.back-button:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Empty State */
+.sh-empty-state {
+    text-align: center;
+    padding: 60px;
+    background: var(--sh-card-bg);
+    border-radius: 20px;
+    border: 1px solid var(--sh-card-border);
+    color: var(--sh-text-secondary);
+}
+
+.sh-empty-icon {
+    font-size: 4rem;
+    margin-bottom: 20px;
+    opacity: 0.5;
+}
+
+/* Layout */
+.sh-grid-layout {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 30px;
+    /* Ensure a minimum height for scrolling content */
+    min-height: 600px;
+}
+
+.sh-grid-layout.has-selection {
+    grid-template-columns: 350px 1fr;
+}
+
+/* Session List Side */
+.sh-sessions-title {
+    color: var(--sh-text-primary);
+    margin-bottom: 20px;
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+
+.sh-session-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    max-height: calc(100vh - 200px);
+    overflow-y: auto;
+    padding-right: 5px;
+}
+
+.sh-session-card {
+    background: var(--sh-card-bg);
+    border: 1px solid var(--sh-card-border);
+    border-radius: 12px;
+    padding: 20px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+.sh-session-card:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+.sh-session-card.selected {
+    background: #000000;
+    border: 2px solid #ffffff;
+}
+
+/* Menu Button */
+.sh-menu-btn {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: transparent;
+    border: 1px solid var(--sh-card-border);
+    border-radius: 8px;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--sh-text-secondary);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.sh-menu-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+}
+
+.sh-menu-dropdown {
+    position: absolute;
+    top: 45px;
+    right: 10px;
+    background: #1a1a1a;
+    border: 1px solid var(--sh-card-border);
+    border-radius: 8px;
+    padding: 5px;
+    z-index: 50;
+    min-width: 120px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+}
+
+.sh-delete-btn {
+    width: 100%;
+    background: transparent;
+    border: none;
+    color: #ef4444;
+    padding: 8px 12px;
+    text-align: left;
+    cursor: pointer;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9rem;
+}
+
+.sh-delete-btn:hover {
+    background: rgba(239, 68, 68, 0.1);
+}
+
+/* Session Info within Card */
+.sh-session-name {
+    color: var(--sh-text-primary);
+    margin: 0 0 5px 0;
+    font-size: 1.1rem;
+    padding-right: 35px;
+}
+
+.sh-session-date {
+    color: var(--sh-text-secondary);
+    font-size: 0.85rem;
+    margin-bottom: 12px;
+}
+
+.sh-tags {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.sh-tag {
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--sh-card-border);
+    color: var(--sh-text-secondary);
+}
+
+.sh-tag.analyzed {
+    background: #ffffff;
+    color: #000000;
+    border-color: #ffffff;
+    font-weight: 700;
+}
+
+/* Details Panel */
+.sh-details-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.sh-section-title {
+    color: var(--sh-text-primary);
+    margin-bottom: 20px;
+    font-size: 1.5rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+/* Video Player */
+.sh-video-wrapper {
+    background: #000;
+    border: 1px solid var(--sh-card-border);
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 20px;
+}
+
+/* Stats Box */
+.sh-stats-box {
+    background: var(--sh-card-bg);
+    border: 1px solid var(--sh-card-border);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.sh-stats-header {
+    color: var(--sh-text-primary);
+    font-size: 1.1rem;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.sh-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    text-align: center;
+}
+
+.sh-stat-label {
+    color: var(--sh-text-tertiary);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 5px;
+}
+
+.sh-stat-value {
+    color: var(--sh-text-primary);
+    font-size: 2rem;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+}
+
+/* Loading Box */
+.sh-loading-box {
+    background: var(--sh-card-bg);
+    border: 1px solid var(--sh-card-border);
+    border-radius: 12px;
+    padding: 40px;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.sh-loading-progress {
+    position: relative;
+    width: 150px;
+    height: 150px;
+    margin: 0 auto 25px;
+}
+
+.sh-progress-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 2rem;
+    font-weight: 800;
+    color: #fff;
+}
+
+.sh-loading-title {
+    color: #fff;
+    font-size: 1.25rem;
+    margin-bottom: 10px;
+}
+
+/* Real-Time Warnings */
+.sh-warnings-box {
+    background: rgba(245, 158, 11, 0.05);
+    /* Very subtle orange tint allowed? Or strict B&W? Sticking to subtle for semantic meaning */
+    border: 1px solid var(--sh-card-border);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.sh-warnings-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-height: 250px;
+    overflow-y: auto;
+}
+
+.sh-warning-item {
+    background: var(--sh-card-bg);
+    border: 1px solid var(--sh-card-border);
+    border-radius: 8px;
+    padding: 12px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transition: all 0.2s;
+}
+
+.sh-warning-item:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateX(5px);
+}
+
+.sh-warning-time {
+    background: #ffffff;
+    color: #000000;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-weight: 700;
+    font-size: 0.85rem;
+    min-width: 60px;
+    text-align: center;
+}
+
+.sh-warning-msg {
+    color: var(--sh-text-primary);
+    flex: 1;
+    font-size: 0.95rem;
+}
+
+/* AI Score Section */
+.sh-ai-box {
+    background: var(--sh-card-bg);
+    border: 1px solid var(--sh-card-border);
+    border-radius: 12px;
+    padding: 25px;
+    margin-bottom: 20px;
+}
+
+.sh-score-display {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+    margin-bottom: 25px;
+}
+
+.sh-score-circle {
+    width: 130px;
+    height: 130px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    /* background: handled via inline style for conic gradient */
+    flex-shrink: 0;
+}
+
+.sh-score-inner {
+    width: 110px;
+    height: 110px;
+    border-radius: 50%;
+    background: var(--sh-bg);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.sh-score-val {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: #ffffff;
+    line-height: 1;
+}
+
+.sh-score-max {
+    font-size: 0.7rem;
+    color: var(--sh-text-tertiary);
+    text-transform: uppercase;
+    margin-top: 5px;
+}
+
+.sh-score-info h3 {
+    font-size: 1.5rem;
+    margin: 0 0 10px 0;
+    color: #ffffff;
+}
+
+.sh-score-summary {
+    color: var(--sh-text-secondary);
+    line-height: 1.5;
+    margin-bottom: 10px;
+}
+
+.sh-form-quality {
+    font-size: 0.9rem;
+    color: var(--sh-text-tertiary);
+}
+
+.sh-form-quality span {
+    color: #fff;
+    font-weight: 600;
+    text-transform: capitalize;
+}
+
+/* Strengths / Weaknesses Grid */
+.sh-sw-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.sh-sw-card {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid var(--sh-card-border);
+    border-radius: 10px;
+    padding: 15px;
+}
+
+.sh-sw-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 0 10px 0;
+    font-size: 0.95rem;
+    font-weight: 600;
+}
+
+.sh-sw-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.sh-sw-list li {
+    position: relative;
+    padding-left: 15px;
+    color: var(--sh-text-secondary);
+    font-size: 0.9rem;
+}
+
+.sh-sw-list li::before {
+    content: "•";
+    position: absolute;
+    left: 0;
+}
+
+/* Recommendations */
+.sh-rec-box {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid var(--sh-card-border);
+    border-radius: 10px;
+    padding: 15px;
+    margin-bottom: 15px;
+}
+
+.sh-rec-title {
+    color: #fff;
+    margin: 0 0 10px 0;
+    font-size: 0.95rem;
+    font-weight: 600;
+}
+
+/* Detected Issues Toggle */
+.sh-issues-box {
+    background: var(--sh-card-bg);
+    border: 1px solid var(--sh-card-border);
+    border-radius: 12px;
+    padding: 20px;
+}
+
+.sh-issues-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.sh-toggle-btn {
+    background: #ffffff;
+    color: #000000;
+    border: none;
+    padding: 6px 14px;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 0.85rem;
+    transition: all 0.2s;
+}
+
+.sh-toggle-btn:hover {
+    background: #e0e0e0;
+}
+
+.sh-severity-filters {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+.sh-sev-filter {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--sh-card-border);
+    border-radius: 8px;
+    padding: 10px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    opacity: 0.5;
+}
+
+.sh-sev-filter.active {
+    background: #ffffff;
+    color: #000;
+    opacity: 1;
+}
+
+.sh-sev-count {
+    font-size: 1.4rem;
+    font-weight: 800;
+}
+
+.sh-sev-label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    font-weight: 600;
+}
+
+/* Clinical Resources Styles */
+.cr-empty-state {
+    margin-top: 20px;
+    text-align: center;
+    padding: 30px;
+    background: var(--sh-card-bg);
+    border-radius: 12px;
+    border: 1px solid var(--sh-card-border);
+}
+
+.cr-find-btn {
+    background: #ffffff;
+    color: #000000;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: all 0.2s ease;
+}
+
+.cr-find-btn:hover {
+    background: #e0e0e0;
+    transform: translateY(-2px);
+}
+
+.cr-container {
+    background: var(--sh-card-bg);
+    border: 1px solid var(--sh-card-border);
+    border-radius: 12px;
+    padding: 20px;
+    margin-top: 20px;
+}
+
+.cr-header {
+    color: var(--sh-text-primary);
+    font-size: 1.1rem;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.cr-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.cr-item {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--sh-card-border);
+    border-radius: 8px;
+    padding: 12px 15px;
+    text-decoration: none;
+    color: var(--sh-text-primary);
+    transition: all 0.2s ease;
+    display: block;
+    position: relative;
+    overflow: hidden;
+}
+
+.cr-item:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateX(5px);
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+.cr-badge {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: #ffffff;
+    color: #000000;
+    font-size: 0.7rem;
+    font-weight: bold;
+    padding: 2px 8px;
+    border-radius: 4px;
+}
+
+.cr-title {
+    font-weight: 600;
+    margin-bottom: 5px;
+    color: var(--sh-text-primary);
+    font-size: 0.95rem;
+    line-height: 1.4;
+    padding-right: 60px;
+}
+
+.cr-summary {
+    font-size: 0.85rem;
+    color: var(--sh-text-secondary);
+    margin-bottom: 8px;
+    line-height: 1.4;
+}
+
+.cr-link {
+    font-size: 0.75rem;
+    color: var(--sh-text-tertiary);
+    margin-top: 5px;
+    font-weight: 500;
+}

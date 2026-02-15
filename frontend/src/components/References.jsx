@@ -10,23 +10,24 @@ function References({ references, title = "📚 Research References" }) {
 
   return (
     <div style={{
-      background: 'rgba(59, 130, 246, 0.1)',
-      border: '2px solid rgba(59, 130, 246, 0.3)',
+      background: 'rgba(255, 255, 255, 0.03)',
+      border: '1px solid rgba(255, 255, 255, 0.1)',
       borderRadius: '12px',
-      padding: '20px',
-      marginTop: '20px'
+      padding: '24px',
+      marginTop: '32px'
     }}>
-      <h3 style={{ 
-        color: '#3b82f6', 
-        fontSize: '1.1rem', 
-        marginBottom: '15px',
+      <h3 style={{
+        color: 'white',
+        fontSize: '1.1rem',
+        marginBottom: '20px',
         display: 'flex',
         alignItems: 'center',
-        gap: '10px'
+        gap: '10px',
+        fontWeight: 600
       }}>
         {title}
       </h3>
-      
+
       <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
         {references.map((ref, index) => (
           <a
@@ -35,52 +36,58 @@ function References({ references, title = "📚 Research References" }) {
             target="_blank"
             rel="noopener noreferrer"
             style={{
-              background: 'rgba(255, 255, 255, 0.05)',
-              border: '1px solid rgba(59, 130, 246, 0.3)',
+              background: 'transparent',
+              border: '1px solid rgba(255, 255, 255, 0.1)',
               borderRadius: '8px',
-              padding: '12px 15px',
+              padding: '16px',
               textDecoration: 'none',
               color: 'white',
               transition: 'all 0.2s ease',
               display: 'block'
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.background = 'rgba(59, 130, 246, 0.15)'
-              e.currentTarget.style.borderColor = 'rgba(59, 130, 246, 0.5)'
-              e.currentTarget.style.transform = 'translateX(5px)'
+              e.currentTarget.style.background = 'rgba(255, 255, 255, 0.05)'
+              e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.3)'
+              e.currentTarget.style.transform = 'translateY(-2px)'
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.background = 'rgba(255, 255, 255, 0.05)'
-              e.currentTarget.style.borderColor = 'rgba(59, 130, 246, 0.3)'
-              e.currentTarget.style.transform = 'translateX(0)'
+              e.currentTarget.style.background = 'transparent'
+              e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.1)'
+              e.currentTarget.style.transform = 'translateY(0)'
             }}
           >
-            <div style={{ 
-              fontWeight: '600', 
-              marginBottom: '5px',
-              color: '#60a5fa',
+            <div style={{
+              fontWeight: '600',
+              marginBottom: '8px',
+              color: 'rgba(255, 255, 255, 0.9)',
               fontSize: '0.95rem',
-              lineHeight: '1.4'
+              lineHeight: '1.5'
             }}>
               {index + 1}. {ref.title}
             </div>
-            <div style={{ 
-              fontSize: '0.85rem', 
-              color: 'rgba(255, 255, 255, 0.7)',
-              display: 'flex',
-              gap: '10px',
-              flexWrap: 'wrap'
+
+            <div style={{
+              fontSize: '0.85rem',
+              color: 'rgba(255, 255, 255, 0.6)',
+              marginBottom: '8px',
+              lineHeight: '1.4'
             }}>
-              <span>{ref.authors}</span>
-              {ref.source && <span>• {ref.source}</span>}
-              {ref.pubdate && <span>• {ref.pubdate}</span>}
+              {ref.authors}
             </div>
+
             <div style={{
               fontSize: '0.75rem',
-              color: 'rgba(59, 130, 246, 0.8)',
-              marginTop: '5px'
+              color: 'rgba(255, 255, 255, 0.4)',
+              display: 'flex',
+              gap: '12px',
+              alignItems: 'center'
             }}>
-              🔗 View on PubMed →
+              {ref.source && <span>{ref.source}</span>}
+              {ref.pubdate && <span>{ref.pubdate}</span>}
+              <span style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '4px', color: 'rgba(255, 255, 255, 0.8)' }}>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" /><polyline points="15 3 21 3 21 9" /><line x1="10" y1="14" x2="21" y2="3" /></svg>
+                Read Source
+              </span>
             </div>
           </a>
         ))}
