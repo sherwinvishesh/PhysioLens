@@ -1,233 +1,273 @@
+from dotenv import load_dotenv
 import os
 import asyncio
-from playwright.async_api import async_playwright
-from typing import List, Dict, Optional
+from claude_agent_sdk import query, ClaudeAgentOptions
+from claude_agent_sdk.types import StreamEvent
+from typing import List, Dict
+import json
+import re
+
+load_dotenv()
+
+# Access the API keys from environment variables
+ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY")
+BRIGHTDATA_API_TOKEN = os.getenv("BRIGHTDATA_API_TOKEN")
+
+if not ANTHROPIC_API_KEY:
+    raise ValueError("ANTHROPIC_API_KEY not found in environment variables")
+if not BRIGHTDATA_API_TOKEN:
+    raise ValueError("BRIGHTDATA_API_TOKEN not found in environment variables")
+
 
 class BrightDataService:
+    """Service for scraping physiology research using BrightData Web MCP and Claude Agent SDK"""
+    
     def __init__(self):
-        self.ws_endpoint = os.getenv("BRIGHTDATA_WS_ENDPOINT")
-        if not self.ws_endpoint:
-            print("⚠️ BRIGHTDATA_WS_ENDPOINT not found in environment variables")
-
-    async def connect_and_scrape(self, url: str, selector: str) -> List[Dict]:
+        # Configure the Claude agent with BrightData Web MCP
+        self.options = ClaudeAgentOptions(
+            mcp_servers={
+                "bright_data": {
+                    "command": "npx",
+                    "args": ["-y", "@brightdata/mcp"],
+                    "env": {
+                        "API_TOKEN": BRIGHTDATA_API_TOKEN,
+                        "PRO_MODE": "true"  # Enable Pro mode for full tool access
+                    }
+                }
+            },
+            allowed_tools=["mcp__bright_data__*"],  # Enable all Bright Data Web MCP tools
+            model="claude-sonnet-4-20250514",  # Use the latest Claude model
+            include_partial_messages=True,
+            permission_mode="acceptEdits",  # Allow file writing if needed
+            max_buffer_size=10 * 1024 * 1024,  # 10MB for handling large responses
+        )
+    
+    async def search_clinical_resources(self, query_text: str) -> List[Dict]:
         """
-        Generic method to scrape a list of items from a URL using a selector.
-        This provides the base connection logic to BrightData.
-        """
-        if not self.ws_endpoint:
-            return []
-
-        print(f"Connecting to Scraping Browser to fetch: {url}")
+        Search multiple physiology research journals for relevant information
         
-        async with async_playwright() as p:
-            try:
-                browser = await p.chromium.connect_over_cdp(self.ws_endpoint)
-                context = await browser.new_context()
-                page = await context.new_page()
-                
-                # Set a reasonable timeout
-                page.set_default_timeout(60000)
-                
-                await page.goto(url, wait_until='domcontentloaded')
-                
-                # Wait for results to appear
-                try:
-                    await page.wait_for_selector(selector, timeout=15000)
-                except Exception:
-                    print(f"Selector {selector} not found on {url}")
-                    await browser.close()
-                    return []
+        Args:
+            query_text: Search query (e.g., "muscle physiology" or "exercise biomechanics")
+            
+        Returns:
+            List of research articles with title, url, authors, snippet, and source
+        """
+        
+        prompt = f"""Search for physiology research articles about: "{query_text}"
 
-                # Extract data based on the specific site logic (to be passed in or handled by caller)
-                # For this generic method, we'll return the page object to be handled by specific methods
-                # BUT, since we can't pass the page object out easily working within the context manager,
-                # we should implement specific scraping logic inside specific methods.
-                pass 
-                
-                await browser.close()
-            except Exception as e:
-                print(f"Error scraping {url}: {e}")
+Please use the Bright Data Web MCP tools to scrape the following physiology research sources and extract relevant articles:
+
+1. Journal of Applied Physiology: https://journals.physiology.org/action/doSearch?AllField={query_text.replace(' ', '+')}&SeriesKey=jappl
+2. The Journal of Physiology: https://physoc.onlinelibrary.wiley.com/action/doSearch?AllField={query_text.replace(' ', '+')}
+3. Mayo Clinic Physiology Research: https://www.mayo.edu/research/departments-divisions/department-physiology-biomedical-engineering/research/physiology
+
+For each source, extract up to 5-10 relevant articles with:
+- title: The title of the research article
+- url: The full URL to the article (including DOI link if available)
+- authors: List of authors or first author (if available)
+- snippet: Abstract or description (max 300 characters)
+- source: The source name (Journal of Applied Physiology, The Journal of Physiology, or Mayo Clinic)
+- pubDate: Publication date (if available)
+- doi: DOI identifier (if available)
+
+Return ONLY a valid JSON array of objects. Do not include any markdown formatting or code blocks.
+
+Example format:
+[
+  {{
+    "title": "Effects of exercise on muscle physiology",
+    "url": "https://journals.physiology.org/doi/10.1152/jappl.2024.12345",
+    "authors": "Smith J, Johnson A",
+    "snippet": "This study investigates the physiological adaptations of skeletal muscle to resistance training...",
+    "source": "Journal of Applied Physiology",
+    "pubDate": "2024-01-15",
+    "doi": "10.1152/jappl.2024.12345"
+  }}
+]
+"""
+        
+        try:
+            response_text = await self._execute_query(prompt)
+            
+            # Try to parse the response as JSON
+            json_match = re.search(r'\[[\s\S]*\]', response_text)
+            if json_match:
+                results = json.loads(json_match.group(0))
+                return results
+            else:
+                print(f"Could not extract JSON from response: {response_text[:200]}...")
                 return []
-        return []
-
-    async def search_nice_guidelines(self, query: str) -> List[Dict]:
-        """Search NICE guidelines"""
-        if not self.ws_endpoint:
-            return []
-
-        url = f"https://www.nice.org.uk/search?q={query}"
-        results = []
-
-        print(f"🔍 Searching NICE for: {query}")
-
-        try:
-            async with async_playwright() as p:
-                browser = await p.chromium.connect_over_cdp(self.ws_endpoint)
-                context = await browser.new_context()
-                page = await context.new_page()
-                page.set_default_timeout(30000)
                 
-                await page.goto(url, wait_until='domcontentloaded')
-                title = await page.title()
-                print(f"   Page Title: {title}")
-                
-                # NICE search results selector
-                try:
-                    # Generic wait for body first
-                    await page.wait_for_selector('body')
-                    
-                    # Try to find the results container - use more generic selectors
-                    await page.wait_for_selector('.search-results-list, .nice-search-results, #search-results, ul.list-unstyled, main ul', timeout=30000)
-                    
-                    # Extract data
-                    items = await page.evaluate('''() => {
-                        const data = [];
-                        // Selectors might change, try to find list items
-                        const nodes = document.querySelectorAll('.search-results-list > li, ul.list-unstyled > li, main ul > li');
-                        
-                        nodes.forEach(node => {
-                            const titleEl = node.querySelector('h3 a, .media-heading a, a');
-                            const summaryEl = node.querySelector('p');
-                            
-                            if (titleEl && titleEl.innerText.length > 5) { // Ensure it's not a tiny link
-                                data.push({
-                                    title: titleEl.innerText.trim(),
-                                    url: titleEl.href,
-                                    summary: summaryEl ? summaryEl.innerText.trim() : '',
-                                    type: 'Guideline',
-                                    source: 'NICE'
-                                });
-                            }
-                        });
-                        return data.slice(0, 5);
-                    }''')
-                    results.extend(items)
-                    
-                except Exception as e:
-                    print(f"   NICE scrape error: {e}")
-
-                await browser.close()
         except Exception as e:
-            print(f"   NICE connection error: {e}")
-            
-        return results
-
-    async def search_nhs(self, query: str) -> List[Dict]:
-        """Search NHS website"""
-        if not self.ws_endpoint:
+            print(f"Error in search_clinical_resources: {e}")
+            import traceback
+            traceback.print_exc()
             return []
+    
+    async def scrape_physiology_journals(self) -> List[Dict]:
+        """
+        Scrape the specific physiology journal URLs for latest articles
+        
+        Returns:
+            List of research articles from all three sources
+        """
+        
+        prompt = """Please use the Bright Data Web MCP tools to scrape the following physiology research journal pages and extract article information:
 
-        url = f"https://www.nhs.uk/search/results?q={query}"
-        results = []
+1. Journal of Applied Physiology: https://journals.physiology.org/action/doSearch?AllField=physiology&SeriesKey=jappl
+2. The Journal of Physiology: https://physoc.onlinelibrary.wiley.com/toc/14697793/2026/604/3
+3. Mayo Clinic Physiology Research: https://www.mayo.edu/research/departments-divisions/department-physiology-biomedical-engineering/research/physiology
 
-        print(f"🔍 Searching NHS for: {query}")
+For each source, extract all visible articles/research items with:
+- title: The title of the research article
+- url: The full URL to the article (including DOI link if available)
+- authors: List of authors or first author (if available)
+- snippet: Abstract or description (max 300 characters)
+- source: The source name
+- pubDate: Publication date (if available)
+- doi: DOI identifier (if available)
 
+Return ONLY a valid JSON array of objects. Do not include any markdown formatting or code blocks.
+
+Example format:
+[
+  {
+    "title": "Effects of exercise on muscle physiology",
+    "url": "https://journals.physiology.org/doi/10.1152/jappl.2024.12345",
+    "authors": "Smith J, Johnson A",
+    "snippet": "This study investigates the physiological adaptations...",
+    "source": "Journal of Applied Physiology",
+    "pubDate": "2024-01-15",
+    "doi": "10.1152/jappl.2024.12345"
+  }
+]
+"""
+        
         try:
-            async with async_playwright() as p:
-                browser = await p.chromium.connect_over_cdp(self.ws_endpoint)
-                context = await browser.new_context()
-                page = await context.new_page()
-                page.set_default_timeout(30000)
-                
-                await page.goto(url, wait_until='domcontentloaded')
-                title = await page.title()
-                print(f"   Page Title: {title}")
-                
-                try:
-                    await page.wait_for_selector('main, body', timeout=30000)
-                    
-                    items = await page.evaluate('''() => {
-                        const data = [];
-                        // Try various selectors for NHS search results
-                        const nodes = document.querySelectorAll('.nhsuk-search__results li, .nhsuk-card, .nhsuk-list--border > li');
-                        
-                        nodes.forEach(node => {
-                            const titleEl = node.querySelector('h2 a') || node.querySelector('.nhsuk-card__heading a') || node.querySelector('a');
-                            const summaryEl = node.querySelector('p');
-                            
-                            if (titleEl && titleEl.innerText) {
-                                data.push({
-                                    title: titleEl.innerText.trim(),
-                                    url: titleEl.href,
-                                    summary: summaryEl ? summaryEl.innerText.trim() : '',
-                                    type: 'Health Info',
-                                    source: 'NHS'
-                                });
-                            }
-                        });
-                        return data.slice(0, 5);
-                    }''')
-                    results.extend(items)
-                    
-                except Exception as e:
-                    print(f"   NHS scrape error: {e}")
-
-                await browser.close()
-        except Exception as e:
-            print(f"   NHS connection error: {e}")
+            response_text = await self._execute_query(prompt)
             
-        return results
-
-    async def search_csp(self, query: str) -> List[Dict]:
-        """Search Chartered Society of Physiotherapy"""
-        if not self.ws_endpoint:
+            json_match = re.search(r'\[[\s\S]*\]', response_text)
+            if json_match:
+                results = json.loads(json_match.group(0))
+                return results
+            else:
+                print(f"Could not extract JSON from response: {response_text[:200]}...")
+                return []
+                
+        except Exception as e:
+            print(f"Error in scrape_physiology_journals: {e}")
+            import traceback
+            traceback.print_exc()
             return []
-
-        url = f"https://www.csp.org.uk/search?search_api_views_fulltext={query}"
-        results = []
-
-        print(f"🔍 Searching CSP for: {query}")
-
-        try:
-            async with async_playwright() as p:
-                browser = await p.chromium.connect_over_cdp(self.ws_endpoint)
-                context = await browser.new_context()
-                page = await context.new_page()
-                
-                await page.goto(url, wait_until='domcontentloaded')
-                
-                try:
-                    await page.wait_for_selector('.view-content', timeout=20000)
-                    
-                    items = await page.evaluate('''() => {
-                        const data = [];
-                        const nodes = document.querySelectorAll('.search-result');
-                        
-                        nodes.forEach(node => {
-                            const titleEl = node.querySelector('h3 a');
-                            const summaryEl = node.querySelector('.search-result__teaser');
-                            
-                            if (titleEl) {
-                                data.push({
-                                    title: titleEl.innerText.trim(),
-                                    url: titleEl.href,
-                                    summary: summaryEl ? summaryEl.innerText.trim() : '',
-                                    type: 'Professional Guidance',
-                                    source: 'CSP'
-                                });
-                            }
-                        });
-                        return data.slice(0, 5);
-                    }''')
-                    results.extend(items)
-                    
-                except Exception as e:
-                    print(f"CSP scrape error: {e}")
-
-                await browser.close()
-        except Exception as e:
-            print(f"CSP connection error: {e}")
+    
+    async def scrape_url(self, url: str) -> str:
+        """
+        Generic method to scrape any URL and return its content
+        
+        Args:
+            url: URL to scrape
             
-        return results
+        Returns:
+            Text content of the page
+        """
+        prompt = f"""Please use the Bright Data Web MCP tools to scrape the following URL and extract the main text content:
+{url}
 
-    async def search_clinical_resources(self, query: str) -> List[Dict]:
-        """Aggregator method"""
+Return the main content of the page in a clean, readable format."""
         
-        # In a production app, we might run these in parallel using asyncio.gather
-        # For now, sequential to ensure stability with the proxy connection
+        try:
+            return await self._execute_query(prompt)
+        except Exception as e:
+            print(f"Error scraping URL: {e}")
+            raise
+    
+    async def _execute_query(self, prompt: str) -> str:
+        """
+        Execute a query using the Claude Agent SDK with BrightData Web MCP
         
-        nice_results = await self.search_nice_guidelines(query)
-        nhs_results = await self.search_nhs(query)
-        csp_results = await self.search_csp(query)
+        Args:
+            prompt: The prompt to send to the agent
+            
+        Returns:
+            The complete response text from the agent
+        """
+        response_text = ""
+        current_tool = None
+        tool_input = ""
         
-        return nice_results + nhs_results + csp_results
+        # Agentic loop: Streams events returned by the Claude Agent SDK
+        async for message in query(prompt=prompt, options=self.options):
+            # Intercept only streaming events
+            if isinstance(message, StreamEvent):
+                event = message.event
+                event_type = event.get("type")
+                
+                if event_type == "content_block_start":
+                    # New tool call is starting
+                    content_block = event.get("content_block", {})
+                    if content_block.get("type") == "tool_use":
+                        current_tool = content_block.get("name")
+                        tool_input = ""
+                        print(f"\n[Tool] Starting: {current_tool}")
+                
+                # Handle incremental text output
+                elif event_type == "content_block_delta":
+                    delta = event.get("delta", {})
+                    if delta.get("type") == "text_delta":
+                        # Accumulate streamed text
+                        text_chunk = delta.get("text", "")
+                        response_text += text_chunk
+                        print(text_chunk, end="", flush=True)
+                    elif delta.get("type") == "input_json_delta":
+                        # Accumulate JSON input as it streams in
+                        chunk = delta.get("partial_json", "")
+                        tool_input += chunk
+                
+                elif event_type == "content_block_stop":
+                    # Tool call complete
+                    if current_tool:
+                        print(f"\n[Tool] {current_tool} completed")
+                        current_tool = None
+        
+        return response_text
+
+
+# Example usage for testing
+async def main():
+    """Test the BrightData service"""
+    service = BrightDataService()
+    
+    print("=" * 60)
+    print("Testing BrightData Web MCP with Claude Agent SDK")
+    print("=" * 60)
+    
+    # Test 1: Search with query
+    print("\n[Test 1] Searching for 'muscle physiology'...")
+    print("-" * 60)
+    results = await service.search_clinical_resources("muscle physiology")
+    
+    print(f"\n\nFound {len(results)} results from search:")
+    for i, result in enumerate(results[:3], 1):  # Show first 3
+        print(f"\n{i}. [{result.get('source', 'Unknown')}] {result.get('title', 'No title')}")
+        print(f"   Authors: {result.get('authors', 'N/A')}")
+        print(f"   URL: {result.get('url', 'No URL')}")
+        print(f"   Snippet: {result.get('snippet', 'No snippet')[:100]}...")
+    
+    # Test 2: Scrape specific journal URLs
+    print("\n" + "=" * 60)
+    print("[Test 2] Scraping specific physiology journal URLs...")
+    print("-" * 60)
+    
+    journal_results = await service.scrape_physiology_journals()
+    
+    print(f"\n\nFound {len(journal_results)} articles from journals:")
+    for i, result in enumerate(journal_results[:5], 1):  # Show first 5
+        print(f"\n{i}. [{result.get('source', 'Unknown')}] {result.get('title', 'No title')}")
+        print(f"   Authors: {result.get('authors', 'N/A')}")
+        print(f"   DOI: {result.get('doi', 'N/A')}")
+        print(f"   URL: {result.get('url', 'No URL')}")
+        print(f"   Date: {result.get('pubDate', 'N/A')}")
+
+
+if __name__ == "__main__":
+    asyncio.run(main())
