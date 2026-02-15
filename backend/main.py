@@ -285,14 +285,23 @@ def assign_exercises(request: AssignExercisesRequest):
         if assignment.target_reps <= 0:
             raise HTTPException(status_code=400, detail=f"Target reps must be greater than 0")
     
-    assigned_exercises = []
+    # Do not clear existing exercises - append or update instead
     for assignment in request.assignments:
-        exercise = next(ex for ex in all_exercises if ex["id"] == assignment.exercise_id)
-        assigned_exercises.append({
-            **exercise,
-            "target_reps": assignment.target_reps,
-            "completed": False
-        })
+        # Check if exercise is already assigned
+        existing_exercise = next((ex for ex in assigned_exercises if ex["id"] == assignment.exercise_id), None)
+        
+        if existing_exercise:
+            # Update existing assignment
+            existing_exercise["target_reps"] = assignment.target_reps
+            existing_exercise["completed"] = False
+        else:
+            # Add new assignment
+            exercise = next(ex for ex in all_exercises if ex["id"] == assignment.exercise_id)
+            assigned_exercises.append({
+                **exercise,
+                "target_reps": assignment.target_reps,
+                "completed": False
+            })
     
     return {
         "message": "Exercises assigned successfully",
