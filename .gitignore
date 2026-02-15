@@ -1,0 +1,52 @@
+# ======================
+# General
+# ======================
+.DS_Store
+Thumbs.db
+.env
+.env.*
+*.log
+
+# ======================
+# Node / Next.js (frontend)
+# ======================
+frontend/node_modules/
+frontend/.next/
+frontend/out/
+frontend/dist/
+frontend/.turbo/
+frontend/npm-debug.log*
+frontend/yarn-debug.log*
+frontend/yarn-error.log*
+frontend/.env.local
+frontend/.env.development.local
+frontend/.env.production.local
+frontend/.env.test.local
+frontend/package-lock.json
+
+# ======================
+# Python / FastAPI (backend)
+# ======================
+**/__pycache__/
+*.py[cod]
+*$py.class
+.env
+venv/
+.venv/
+env/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+dist/
+build/
+*.egg-info/
+
+# ======================
+# IDEs & Editors
+# ======================
+.vscode/
+.idea/
+*.swp
+*.swo
