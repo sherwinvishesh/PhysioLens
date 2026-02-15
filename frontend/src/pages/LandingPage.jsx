@@ -326,7 +326,7 @@ function LandingPage() {
             >
               <div className="landing-role-image-container">
                 <img
-                  src="https://hoirqrkdgbmvpwutwuwj.supabase.co/storage/v1/object/public/assets/assets/f6789185-8288-444d-b735-bb2e99496645_800w.jpg"
+                  src="/doctor.png"
                   alt="Doctor Interface"
                   className="landing-role-image"
                 />
@@ -351,7 +351,7 @@ function LandingPage() {
             >
               <div className="landing-role-image-container">
                 <img
-                  src="https://hoirqrkdgbmvpwutwuwj.supabase.co/storage/v1/object/public/assets/assets/578af862-1f22-4fc5-80fa-63d65b09b74b_800w.jpg"
+                  src="/patient.png"
                   alt="Patient Interface"
                   className="landing-role-image"
                 />
@@ -376,7 +376,7 @@ function LandingPage() {
             >
               <div className="landing-role-image-container">
                 <img
-                  src="https://hoirqrkdgbmvpwutwuwj.supabase.co/storage/v1/object/public/assets/assets/00552811-c9ca-4219-a1c3-c56163ce4db1_800w.jpg"
+                  src="/analytics.png"
                   alt="Session Analytics"
                   className="landing-role-image"
                 />
