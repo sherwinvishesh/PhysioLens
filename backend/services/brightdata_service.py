@@ -53,37 +53,30 @@ class BrightDataService:
             List of research articles with title, url, authors, snippet, and source
         """
         
-        prompt = f"""Search for physiology research articles about: "{query_text}"
+        prompt = f"""Use ONLY the search_engine tool to find research articles about "{query_text}".
 
-Please use the Bright Data Web MCP tools to scrape the following physiology research sources and extract relevant articles:
+IMPORTANT: You MUST get results from ALL THREE sources below. Search each one separately:
 
-1. Journal of Applied Physiology: https://journals.physiology.org/action/doSearch?AllField={query_text.replace(' ', '+')}&SeriesKey=jappl
-2. The Journal of Physiology: https://physoc.onlinelibrary.wiley.com/action/doSearch?AllField={query_text.replace(' ', '+')}
-3. Mayo Clinic Physiology Research: https://www.mayo.edu/research/departments-divisions/department-physiology-biomedical-engineering/research/physiology
+1. Search "site:journals.physiology.org {query_text}" - Get 3-4 results from Journal of Applied Physiology
+2. Search "site:physoc.onlinelibrary.wiley.com {query_text}" - Get 3-4 results from The Journal of Physiology  
+3. Search "site:mayo.edu physiology {query_text}" - Get 3-4 results from Mayo Clinic
 
-For each source, extract up to 5-10 relevant articles with:
-- title: The title of the research article
-- url: The full URL to the article (including DOI link if available)
-- authors: List of authors or first author (if available)
-- snippet: Abstract or description (max 300 characters)
-- source: The source name (Journal of Applied Physiology, The Journal of Physiology, or Mayo Clinic)
-- pubDate: Publication date (if available)
-- doi: DOI identifier (if available)
+For EACH result, extract:
+- title
+- url (full link)
+- authors (if visible in search result)
+- snippet (brief description, max 200 chars)
+- source (which of the 3 sources)
+- pubDate (if visible)
+- doi (if visible)
 
-Return ONLY a valid JSON array of objects. Do not include any markdown formatting or code blocks.
+CRITICAL: 
+- Use ONLY search_engine tool (fastest)
+- Do NOT use scrape, grep, or batch tools
+- Return results from ALL 3 sources
+- Return ONLY valid JSON array, no markdown
 
-Example format:
-[
-  {{
-    "title": "Effects of exercise on muscle physiology",
-    "url": "https://journals.physiology.org/doi/10.1152/jappl.2024.12345",
-    "authors": "Smith J, Johnson A",
-    "snippet": "This study investigates the physiological adaptations of skeletal muscle to resistance training...",
-    "source": "Journal of Applied Physiology",
-    "pubDate": "2024-01-15",
-    "doi": "10.1152/jappl.2024.12345"
-  }}
-]
+[{{"title":"...","url":"...","authors":"...","snippet":"...","source":"...","pubDate":"...","doi":"..."}}]
 """
         
         try:
