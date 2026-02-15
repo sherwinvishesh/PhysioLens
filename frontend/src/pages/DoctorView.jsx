@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useMeetingMode } from '../contexts/MeetingModeContext'
+import '../styles/DoctorView.css'
 
 function DoctorView() {
   const navigate = useNavigate()
@@ -13,10 +14,7 @@ function DoctorView() {
   const [message, setMessage] = useState(null)
 
   // Meeting Mode
-const { 
-  enabled: meetingModeEnabled, 
-  isRecording
-} = useMeetingMode()
+  const { enabled: meetingModeEnabled, isRecording } = useMeetingMode()
 
   useEffect(() => {
     fetchExercises()
@@ -47,7 +45,7 @@ const {
           setTargetReps(prev => ({ ...prev, [exerciseId]: 10 }))
           return [...prev, exerciseId]
         } else {
-          setMessage({ type: 'error', text: 'Maximum 5 exercises can be selected' })
+          // Subtle shake or toast could go here
           return prev
         }
       }
@@ -60,17 +58,7 @@ const {
   }
 
   const handleAssignExercises = async () => {
-    if (selectedExercises.length === 0) {
-      setMessage({ type: 'error', text: 'Please select at least 1 exercise' })
-      return
-    }
-
-    for (const exerciseId of selectedExercises) {
-      if (!targetReps[exerciseId] || targetReps[exerciseId] <= 0) {
-        setMessage({ type: 'error', text: 'Please set target reps greater than 0 for all selected exercises' })
-        return
-      }
-    }
+    if (selectedExercises.length === 0) return
 
     try {
       const assignments = selectedExercises.map(exerciseId => ({
@@ -89,244 +77,161 @@ const {
       const data = await response.json()
 
       if (response.ok) {
-        setMessage({ 
-          type: 'success', 
-          text: `Successfully assigned ${data.assigned_count} exercise(s)!` 
-        })
-        setTimeout(() => {
-          setSelectedExercises([])
-          setTargetReps({})
-        }, 2000)
-      } else {
-        setMessage({ type: 'error', text: data.detail })
+        // Success feedback
+        setSelectedExercises([])
+        setTargetReps({})
       }
     } catch (error) {
       console.error('Error assigning exercises:', error)
-      setMessage({ type: 'error', text: 'Failed to assign exercises' })
     }
   }
 
   const handleClearSelection = () => {
     setSelectedExercises([])
     setTargetReps({})
-    setMessage(null)
-  }
-
-  const handleStopRecording = () => {
-    stopRecording()
-    const data = getSessionData()
-    console.log('Pre-session transcript:', data.phaseTranscripts.preSession)
-    
-    // You can save this to localStorage or backend here
-    if (data.phaseTranscripts.preSession.trim()) {
-      localStorage.setItem('lastPreSessionTranscript', data.phaseTranscripts.preSession)
-      alert('Pre-session notes saved!')
-    }
   }
 
   if (loading) {
     return (
-      <div className="page-container">
-        <div className="loading">Loading exercises...</div>
+      <div className="doctor-page">
+        <div className="doctor-bg" />
+        <div style={{ display: 'flex', height: '100vh', alignItems: 'center', justifyContent: 'center' }}>
+          <div className="spinner-minimal" />
+        </div>
       </div>
     )
   }
 
   return (
-    <div className="page-container">
-      <div className="page-header">
-        <h1>👨‍⚕️ Doctor View</h1>
-        <p>Select exercises and set target reps for your patient (Maximum 5)</p>
-      </div>
+    <div className="doctor-page">
+      <div className="doctor-bg" />
 
-      <div className="content-card">
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-          <button 
-            className="btn btn-secondary back-button"
-            onClick={() => navigate('/')}
-          >
-            ← Back to Home
-          </button>
-          
-          <button 
-            className="btn btn-primary"
-            onClick={() => navigate('/add-exercise')}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px',
-              padding: '12px 24px',
-              fontSize: '1rem'
-            }}
-          >
-            <span style={{ fontSize: '1.2rem' }}>➕</span>
-            Add Custom Exercise
-          </button>
-        </div>
-
-{/* Meeting Mode Indicator */}
-{meetingModeEnabled && (
-  <div style={{
-    background: 'rgba(102, 126, 234, 0.1)',
-    border: '2px solid rgba(102, 126, 234, 0.3)',
-    borderRadius: '15px',
-    padding: '20px',
-    marginBottom: '30px',
-    textAlign: 'center'
-  }}>
-    <h3 style={{ 
-      color: '#667eea', 
-      marginBottom: '10px',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      gap: '10px'
-    }}>
-      🎤 Meeting Mode Active
-      {isRecording && (
-        <span style={{
-          fontSize: '0.75rem',
-          background: 'rgba(239, 68, 68, 0.2)',
-          color: '#ef4444',
-          padding: '4px 10px',
-          borderRadius: '12px',
-          fontWeight: '700',
-          animation: 'pulse 1.5s ease-in-out infinite'
-        }}>
-          ● RECORDING
-        </span>
-      )}
-    </h3>
-    <p style={{ color: 'rgba(255, 255, 255, 0.8)', margin: 0 }}>
-      Voice recording is active - emergency and meeting detection enabled
-    </p>
-  </div>
-)}
-
-        {message && (
-          <div className={`alert alert-${message.type}`}>
-            {message.text}
-          </div>
-        )}
-
-        <div className="selection-info">
-          <h3>Selected: {selectedExercises.length} / 5</h3>
-          <p>Click on exercise cards to select them and set target reps</p>
-        </div>
-
-        <div className="exercise-grid">
-          {exercises.map(exercise => (
-            <div
-              key={exercise.id}
-              className={`exercise-card ${selectedExercises.includes(exercise.id) ? 'selected' : ''}`}
-              onClick={() => handleToggleExercise(exercise.id)}
-            >
-              <div className="exercise-card-header">
-                <div>
-                  <h3>{exercise.name}</h3>
-                  <span className={`difficulty-badge difficulty-${exercise.difficulty.toLowerCase()}`}>
-                    {exercise.difficulty}
-                  </span>
-                  {exercise.config && (
-                    <span style={{
-                      display: 'inline-block',
-                      marginLeft: '8px',
-                      padding: '4px 10px',
-                      background: 'linear-gradient(135deg, #8b5cf6 0%, #667eea 100%)',
-                      color: 'white',
-                      borderRadius: '10px',
-                      fontSize: '0.7rem',
-                      fontWeight: '700',
-                      textTransform: 'uppercase',
-                      letterSpacing: '0.5px'
-                    }}>
-                      🤖 AI Created
-                    </span>
-                  )}
-                </div>
-                <input 
-                  type="checkbox"
-                  className="checkbox"
-                  checked={selectedExercises.includes(exercise.id)}
-                  onChange={() => {}}
-                />
-              </div>
-              <p>{exercise.description}</p>
-              <p className="duration">⏱️ {exercise.duration}</p>
-              
-              {selectedExercises.includes(exercise.id) && (
-                <div 
-                  className="target-reps-input"
-                  onClick={(e) => e.stopPropagation()}
-                  style={{
-                    marginTop: '15px',
-                    padding: '15px',
-                    background: 'rgba(102, 126, 234, 0.1)',
-                    borderRadius: '8px',
-                    border: '1px solid rgba(102, 126, 234, 0.3)'
-                  }}
-                >
-                  <label 
-                    htmlFor={`reps-${exercise.id}`}
-                    style={{
-                      display: 'block',
-                      marginBottom: '8px',
-                      fontWeight: '600',
-                      color: '#00FF88',
-                      fontSize: '0.9rem'
-                    }}
-                  >
-                    Target Reps:
-                  </label>
-                  <input
-                    id={`reps-${exercise.id}`}
-                    type="number"
-                    min="1"
-                    value={targetReps[exercise.id] || ''}
-                    onChange={(e) => handleTargetRepsChange(exercise.id, e.target.value)}
-                    placeholder="Enter target reps"
-                    style={{
-                      width: '100%',
-                      padding: '10px',
-                      fontSize: '1.1rem',
-                      fontWeight: '700',
-                      border: '2px solid rgba(102, 126, 234, 0.4)',
-                      borderRadius: '6px',
-                      background: 'rgba(255, 255, 255, 0.9)',
-                      color: '#333',
-                      textAlign: 'center'
-                    }}
-                  />
-                </div>
-              )}
+      <div className="doctor-container">
+        {/* Header Section */}
+        <div className="doctor-header animate-enter">
+          {meetingModeEnabled && (
+            <div className="meeting-pill">
+              <span className="recording-dot" />
+              SESSION RECORDING ACTIVE
             </div>
-          ))}
+          )}
+
+          <h1 className="doctor-title">
+            Select Exercises for you Patient
+          </h1>
+          <p className="doctor-subtitle">
+            Select up to 5 exercises to build a custom rehabilitation program.
+            AI-driven recommendations are highlighted based on patient history.
+          </p>
+
+          <div className="doctor-stats">
+            <div className="doctor-stat-item">
+              <svg className="doctor-stat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M23 21v-2a4 4 0 0 0-3-3.87" /><path d="M16 3.13a4 4 0 0 1 0 7.75" /></svg>
+              <span>Active Patient: John Doe</span>
+            </div>
+            <div className="doctor-stat-item">
+              <svg className="doctor-stat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2" /><line x1="16" y1="2" x2="16" y2="6" /><line x1="8" y1="2" x2="8" y2="6" /><line x1="3" y1="10" x2="21" y2="10" /></svg>
+              <span>Program Duration: 4 Weeks</span>
+            </div>
+            <div className="doctor-stat-item">
+              <svg className="doctor-stat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" /><polyline points="22 4 12 14.01 9 11.01" /></svg>
+              <span>Status: In Progress</span>
+            </div>
+          </div>
+
+          <div className="doctor-controls delay-100 animate-enter">
+            <div className="doctor-filters">
+              <button className="doctor-filter-btn active">All Exercises</button>
+              <button className="doctor-filter-btn">Strength</button>
+              <button className="doctor-filter-btn">Mobility</button>
+              <button className="doctor-filter-btn">Balance</button>
+            </div>
+
+            <button className="doctor-action-secondary" onClick={() => navigate('/add-exercise')}>
+              <span>+ Add Custom Exercise</span>
+            </button>
+          </div>
         </div>
 
-        <div className="action-buttons">
-          <button 
-            className="btn btn-secondary"
-            onClick={handleClearSelection}
-            disabled={selectedExercises.length === 0}
-          >
-            Clear Selection
-          </button>
-          <button 
-            className="btn btn-success"
-            onClick={handleAssignExercises}
-            disabled={selectedExercises.length === 0}
-          >
-            Assign {selectedExercises.length} Exercise{selectedExercises.length !== 1 ? 's' : ''}
-          </button>
+        {/* Grid Section */}
+        <div className="doctor-grid delay-200 animate-enter">
+          {exercises.map(exercise => {
+            const isSelected = selectedExercises.includes(exercise.id)
+            return (
+              <div
+                key={exercise.id}
+                className={`doctor-card ${isSelected ? 'selected' : ''}`}
+                onClick={() => handleToggleExercise(exercise.id)}
+              >
+                <div className="doctor-card-content">
+                  <div className="doctor-card-top">
+                    <div className="doctor-badge-group">
+                      <span className="doctor-badge">
+                        {exercise.difficulty}
+                      </span>
+                      {exercise.config && (
+                        <span className="doctor-badge">
+                          AI Generated
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="doctor-checkbox-wrapper">
+                      <input
+                        type="checkbox"
+                        className="doctor-checkbox"
+                        checked={isSelected}
+                        readOnly
+                      />
+                    </div>
+                  </div>
+
+                  <h3 className="doctor-card-title">{exercise.name}</h3>
+                  <p className="doctor-card-desc">{exercise.description}</p>
+
+                  <div style={{ marginTop: 'auto' }}>
+                    {isSelected ? (
+                      <input
+                        type="number"
+                        className="doctor-reps-input"
+                        placeholder="Target Reps"
+                        value={targetReps[exercise.id] || ''}
+                        onClick={(e) => e.stopPropagation()}
+                        onChange={(e) => handleTargetRepsChange(exercise.id, e.target.value)}
+                        autoFocus
+                      />
+                    ) : (
+                      <div className="doctor-meta-row">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></svg>
+                        <span>{exercise.duration}</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )
+          })}
         </div>
       </div>
 
-      <style>{`
-        @keyframes pulse {
-          0%, 100% { opacity: 1; }
-          50% { opacity: 0.6; }
-        }
-      `}</style>
+      {/* Floating Selection Bar */}
+      {selectedExercises.length > 0 && (
+        <div className="doctor-selection-bar">
+          <div className="doctor-selection-info">
+            <span className="doctor-selection-text">{selectedExercises.length} Selected</span>
+            <span className="doctor-selection-count"> / 5</span>
+          </div>
+
+          <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+            <button className="doctor-clear-btn" onClick={handleClearSelection}>
+              Clear
+            </button>
+            <button className="doctor-assign-btn" onClick={handleAssignExercises}>
+              Assign Program
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

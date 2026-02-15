@@ -1,0 +1,484 @@
+/* Doctor View - Premium Polish */
+@import url('https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap');
+
+:root {
+    --bg-dark: #0a0a0a;
+    --card-bg: rgba(255, 255, 255, 0.05);
+    --card-border: rgba(255, 255, 255, 0.1);
+    --card-hover: rgba(255, 255, 255, 0.1);
+    --text-primary: rgba(255, 255, 255, 0.9);
+    --text-secondary: rgba(255, 255, 255, 0.7);
+    --text-tertiary: rgba(255, 255, 255, 0.5);
+    --accent: #fff;
+}
+
+/* Base Layout */
+.doctor-page {
+    min-height: 100vh;
+    background-color: var(--bg-dark);
+    font-family: 'Geist', 'Inter', sans-serif;
+    color: var(--text-primary);
+    position: relative;
+    overflow-x: hidden;
+}
+
+/* Background Gradients/Blur */
+.doctor-bg {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background:
+        radial-gradient(circle at 15% 50%, rgba(255, 255, 255, 0.03), transparent 25%),
+        radial-gradient(circle at 85% 30%, rgba(255, 255, 255, 0.02), transparent 25%);
+}
+
+.doctor-container {
+    position: relative;
+    z-index: 10;
+    max-width: 80rem;
+    /* max-w-7xl */
+    margin: 0 auto;
+    padding: 5rem 1.5rem;
+}
+
+@media (min-width: 1024px) {
+    .doctor-container {
+        padding: 6rem 2rem;
+    }
+}
+
+/* Header Section */
+.doctor-header {
+    margin-bottom: 4rem;
+}
+
+.doctor-title {
+    font-size: clamp(2.5rem, 5vw, 4.5rem);
+    /* Matching the massive headers */
+    font-weight: 600;
+    letter-spacing: -0.04em;
+    line-height: 1;
+    color: white;
+    margin-bottom: 1.5rem;
+    max-width: 40rem;
+}
+
+.doctor-subtitle {
+    font-size: 1.125rem;
+    line-height: 1.6;
+    color: var(--text-secondary);
+    max-width: 32rem;
+    margin-bottom: 2.5rem;
+}
+
+/* Stats Row */
+.doctor-stats {
+    display: flex;
+    gap: 2rem;
+    border-top: 1px solid var(--card-border);
+    border-bottom: 1px solid var(--card-border);
+    padding: 1.5rem 0;
+    margin-bottom: 3rem;
+    flex-wrap: wrap;
+}
+
+.doctor-stat-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.doctor-stat-icon {
+    width: 18px;
+    height: 18px;
+    color: var(--text-tertiary);
+}
+
+/* Filters / Actions Bar */
+.doctor-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.doctor-filters {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.doctor-filter-btn {
+    padding: 0.5rem 1rem;
+    border-radius: 9999px;
+    border: 1px solid var(--card-border);
+    background: transparent;
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.doctor-filter-btn:hover,
+.doctor-filter-btn.active {
+    background: var(--card-bg);
+    border-color: rgba(255, 255, 255, 0.2);
+    color: white;
+}
+
+.doctor-action-secondary {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.doctor-action-secondary:hover {
+    color: white;
+}
+
+/* Grid Layout */
+.doctor-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+}
+
+@media (min-width: 640px) {
+    .doctor-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (min-width: 1024px) {
+    .doctor-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+/* Premium Card */
+.doctor-card {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 1rem;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.doctor-card:hover {
+    background: var(--card-hover);
+    transform: translateY(-4px);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.doctor-card.selected {
+    border-color: rgba(255, 255, 255, 0.4);
+    background: rgba(255, 255, 255, 0.08);
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.1);
+}
+
+.doctor-card-content {
+    padding: 1.5rem;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Card Header Area */
+.doctor-card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+}
+
+.doctor-badge-group {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.doctor-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.25rem 0.625rem;
+    border-radius: 9999px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--card-border);
+    font-size: 0.7rem;
+    font-weight: 500;
+    color: var(--text-primary);
+    text-transform: capitalize;
+}
+
+.doctor-badge svg {
+    width: 12px;
+    height: 12px;
+    opacity: 0.7;
+}
+
+/* Card Select/Checkbox */
+.doctor-checkbox-wrapper {
+    position: relative;
+    width: 20px;
+    height: 20px;
+}
+
+.doctor-checkbox {
+    appearance: none;
+    width: 100%;
+    height: 100%;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 4px;
+    background: transparent;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.doctor-checkbox:checked {
+    background: white;
+    border-color: white;
+}
+
+.doctor-checkbox:checked::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 10px;
+    height: 10px;
+    background: black;
+    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='20 6 9 17 4 12'%3E%3C/polyline%3E%3C/svg%3E") no-repeat center;
+    mask-size: contain;
+    -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='20 6 9 17 4 12'%3E%3C/polyline%3E%3C/svg%3E") no-repeat center;
+    -webkit-mask-size: contain;
+}
+
+/* Typography in Card */
+.doctor-card-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: white;
+    margin-bottom: 0.5rem;
+    letter-spacing: -0.02em;
+}
+
+.doctor-card-desc {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    line-height: 1.5;
+    margin-bottom: 1.5rem;
+}
+
+/* Card Footer / Reps */
+.doctor-card-footer {
+    margin-top: auto;
+    border-top: 1px solid var(--card-border);
+    padding-top: 1rem;
+}
+
+.doctor-reps-wrapper {
+    animation: fadeIn 0.1s ease-out;
+}
+
+.doctor-reps-input {
+    width: 100%;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--card-border);
+    color: white;
+    padding: 0.625rem;
+    border-radius: 0.5rem;
+    font-family: inherit;
+    font-size: 0.875rem;
+    transition: all 0.2s;
+}
+
+.doctor-reps-input:focus {
+    outline: none;
+    border-color: rgba(255, 255, 255, 0.4);
+    background: rgba(0, 0, 0, 0.5);
+}
+
+.doctor-meta-row {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    font-size: 0.75rem;
+    color: var(--text-tertiary);
+    margin-top: 0.5rem;
+}
+
+/* Floating Bottom Bar (Selection) */
+.doctor-selection-bar {
+    position: fixed;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(20, 20, 20, 0.8);
+    backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 0.75rem 0.75rem 0.75rem 1.5rem;
+    border-radius: 9999px;
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    z-index: 50;
+    box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.5);
+    animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    min-width: 320px;
+    justify-content: space-between;
+}
+
+.doctor-selection-text {
+    font-size: 0.875rem;
+    color: white;
+    font-weight: 500;
+}
+
+.doctor-selection-count {
+    color: var(--text-secondary);
+}
+
+.doctor-assign-btn {
+    background: white;
+    color: black;
+    border: none;
+    padding: 0.5rem 1.25rem;
+    border-radius: 9999px;
+    font-weight: 600;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: transform 0.1s;
+}
+
+.doctor-assign-btn:hover {
+    transform: scale(1.02);
+}
+
+.doctor-assign-btn:active {
+    transform: scale(0.98);
+}
+
+.doctor-clear-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 0.75rem;
+    cursor: pointer;
+    padding: 0.5rem;
+}
+
+.doctor-clear-btn:hover {
+    color: white;
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideUp {
+    from {
+        transform: translate(-50%, 100%);
+        opacity: 0;
+    }
+
+    to {
+        transform: translate(-50%, 0);
+        opacity: 1;
+    }
+}
+
+@keyframes fadeSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+        filter: blur(5px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+        filter: blur(0);
+    }
+}
+
+.animate-enter {
+    animation: fadeSlideIn 0.8s ease-out forwards;
+    opacity: 0;
+}
+
+.delay-100 {
+    animation-delay: 0.1s;
+}
+
+.delay-200 {
+    animation-delay: 0.2s;
+}
+
+.delay-300 {
+    animation-delay: 0.3s;
+}
+
+/* Meeting Indicator */
+.meeting-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.375rem 0.75rem;
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.2);
+    color: #ef4444;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    margin-bottom: 2rem;
+}
+
+.recording-dot {
+    width: 8px;
+    height: 8px;
+    background: currentColor;
+    border-radius: 50%;
+    animation: pulse 1.5s infinite;
+}
+
+/* Spinner */
+.spinner-minimal {
+    width: 24px;
+    height: 24px;
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
