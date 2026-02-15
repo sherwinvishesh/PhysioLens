@@ -1,0 +1,128 @@
+/* Form Feedback Warning Styles */
+
+.form-feedback-overlay {
+  position: fixed;
+  top: 100px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.form-feedback-overlay.visible {
+  opacity: 1;
+  pointer-events: all;
+}
+
+.form-feedback-popup {
+  background: white;
+  border-radius: 16px;
+  padding: 20px 24px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-width: 400px;
+  max-width: 600px;
+  border-left: 6px solid;
+  animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+  from {
+    transform: translateY(-20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.form-feedback-popup.severity-high {
+  border-left-color: #ef4444;
+  background: linear-gradient(135deg, #fff5f5 0%, #ffffff 100%);
+}
+
+.form-feedback-popup.severity-medium {
+  border-left-color: #f59e0b;
+  background: linear-gradient(135deg, #fffbeb 0%, #ffffff 100%);
+}
+
+.form-feedback-popup.severity-info {
+  border-left-color: #3b82f6;
+  background: linear-gradient(135deg, #eff6ff 0%, #ffffff 100%);
+}
+
+.form-feedback-popup.severity-low {
+  border-left-color: #10b981;
+  background: linear-gradient(135deg, #f0fdf4 0%, #ffffff 100%);
+}
+
+.feedback-icon {
+  font-size: 2rem;
+  flex-shrink: 0;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+}
+
+.feedback-content {
+  flex: 1;
+}
+
+.feedback-message {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.feedback-dismiss {
+  background: none;
+  border: none;
+  font-size: 1.8rem;
+  color: #9ca3af;
+  cursor: pointer;
+  padding: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.feedback-dismiss:hover {
+  background: rgba(0, 0, 0, 0.05);
+  color: #4b5563;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  .form-feedback-popup {
+    min-width: 300px;
+    max-width: 90vw;
+    padding: 16px 20px;
+  }
+
+  .feedback-icon {
+    font-size: 1.5rem;
+  }
+
+  .feedback-message {
+    font-size: 1rem;
+  }
+}
