@@ -55,9 +55,9 @@ function ClinicalNotes() {
 
   const formatDate = (dateString) => {
     const date = new Date(dateString)
-    return date.toLocaleString('en-US', { 
+    return date.toLocaleString('en-US', {
       weekday: 'short',
-      month: 'short', 
+      month: 'short',
       day: 'numeric',
       year: 'numeric',
       hour: '2-digit',
@@ -87,7 +87,7 @@ function ClinicalNotes() {
       </div>
 
       <div className="content-card">
-        <button 
+        <button
           className="btn btn-secondary back-button"
           onClick={() => navigate('/')}
         >
@@ -107,8 +107,8 @@ function ClinicalNotes() {
             onClick={() => setActiveTab('summaries')}
             style={{
               padding: '15px 35px',
-              background: activeTab === 'summaries' 
-                ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' 
+              background: activeTab === 'summaries'
+                ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
                 : 'transparent',
               border: 'none',
               color: 'white',
@@ -127,8 +127,8 @@ function ClinicalNotes() {
             onClick={() => setActiveTab('meetings')}
             style={{
               padding: '15px 35px',
-              background: activeTab === 'meetings' 
-                ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' 
+              background: activeTab === 'meetings'
+                ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
                 : 'transparent',
               border: 'none',
               color: 'white',
@@ -168,31 +168,31 @@ function ClinicalNotes() {
                     }}
                   >
                     {/* Header */}
-                    <div style={{ 
-                      display: 'flex', 
-                      justifyContent: 'space-between', 
-                      alignItems: 'start', 
+                    <div style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'start',
                       marginBottom: '25px',
                       paddingBottom: '20px',
                       borderBottom: '1px solid rgba(255, 255, 255, 0.1)'
                     }}>
                       <div>
-                        <h3 style={{ 
-                          color: '#00FF88', 
-                          fontSize: '1.8rem', 
+                        <h3 style={{
+                          color: '#00FF88',
+                          fontSize: '1.8rem',
                           marginBottom: '10px',
                           fontWeight: '700'
                         }}>
                           {note.exercise_name}
                         </h3>
-                        <p style={{ 
-                          color: 'rgba(255, 255, 255, 0.7)', 
+                        <p style={{
+                          color: 'rgba(255, 255, 255, 0.7)',
                           fontSize: '0.95rem',
                           marginBottom: '15px'
                         }}>
                           📅 {formatDate(note.date)}
                         </p>
-                        
+
                         {/* Stats Row */}
                         <div style={{ display: 'flex', gap: '15px', flexWrap: 'wrap' }}>
                           <span style={{
@@ -219,11 +219,11 @@ function ClinicalNotes() {
                             alignItems: 'center',
                             gap: '6px'
                           }}>
-                            ⏱️ {formatDuration(note.duration)}
+                            {formatDuration(note.duration)}
                           </span>
                         </div>
                       </div>
-                      
+
                       <button
                         onClick={() => handleDeleteSummary(note.id)}
                         style={{
@@ -256,9 +256,9 @@ function ClinicalNotes() {
                         borderRadius: '15px',
                         border: '1px solid rgba(102, 126, 234, 0.2)'
                       }}>
-                        <h4 style={{ 
-                          color: '#667eea', 
-                          marginBottom: '20px', 
+                        <h4 style={{
+                          color: '#667eea',
+                          marginBottom: '20px',
                           fontSize: '1.3rem',
                           fontWeight: '700',
                           display: 'flex',
@@ -267,20 +267,20 @@ function ClinicalNotes() {
                         }}>
                           🤖 AI Clinical Summary
                         </h4>
-                        
+
                         {/* Chief Complaint */}
                         {note.summary.chief_complaint && (
                           <div style={{ marginBottom: '20px' }}>
-                            <strong style={{ 
-                              color: '#00FF88', 
+                            <strong style={{
+                              color: '#00FF88',
                               fontSize: '1.05rem',
                               display: 'block',
                               marginBottom: '8px'
                             }}>
                               Chief Complaint:
                             </strong>
-                            <p style={{ 
-                              color: 'rgba(255, 255, 255, 0.95)', 
+                            <p style={{
+                              color: 'rgba(255, 255, 255, 0.95)',
                               lineHeight: '1.6',
                               fontSize: '1rem',
                               margin: 0
@@ -293,16 +293,16 @@ function ClinicalNotes() {
                         {/* Session Notes */}
                         {note.summary.session_notes && (
                           <div style={{ marginBottom: '20px' }}>
-                            <strong style={{ 
-                              color: '#00FF88', 
+                            <strong style={{
+                              color: '#00FF88',
                               fontSize: '1.05rem',
                               display: 'block',
                               marginBottom: '8px'
                             }}>
                               Session Notes:
                             </strong>
-                            <p style={{ 
-                              color: 'rgba(255, 255, 255, 0.95)', 
+                            <p style={{
+                              color: 'rgba(255, 255, 255, 0.95)',
                               lineHeight: '1.7',
                               fontSize: '1rem',
                               margin: 0,
@@ -316,16 +316,16 @@ function ClinicalNotes() {
                         {/* Recommendations */}
                         {note.summary.recommendations && note.summary.recommendations.length > 0 && (
                           <div style={{ marginBottom: '20px' }}>
-                            <strong style={{ 
-                              color: '#00FF88', 
+                            <strong style={{
+                              color: '#00FF88',
                               fontSize: '1.05rem',
                               display: 'block',
                               marginBottom: '10px'
                             }}>
                               Recommendations:
                             </strong>
-                            <ul style={{ 
-                              color: 'rgba(255, 255, 255, 0.95)', 
+                            <ul style={{
+                              color: 'rgba(255, 255, 255, 0.95)',
                               paddingLeft: '25px',
                               margin: 0,
                               lineHeight: '1.8'
@@ -340,24 +340,24 @@ function ClinicalNotes() {
                         )}
 
                         {/* Patient Mood & Compliance */}
-                        <div style={{ 
-                          display: 'flex', 
-                          gap: '15px', 
+                        <div style={{
+                          display: 'flex',
+                          gap: '15px',
                           marginBottom: '20px',
                           flexWrap: 'wrap'
                         }}>
                           {note.summary.patient_mood && (
                             <span style={{
-                              background: note.summary.patient_mood === 'positive' 
-                                ? 'rgba(16, 185, 129, 0.2)' 
-                                : note.summary.patient_mood === 'concerned' 
-                                ? 'rgba(239, 68, 68, 0.2)' 
-                                : 'rgba(156, 163, 175, 0.2)',
-                              color: note.summary.patient_mood === 'positive' 
-                                ? '#10b981' 
-                                : note.summary.patient_mood === 'concerned' 
-                                ? '#ef4444' 
-                                : '#9ca3af',
+                              background: note.summary.patient_mood === 'positive'
+                                ? 'rgba(16, 185, 129, 0.2)'
+                                : note.summary.patient_mood === 'concerned'
+                                  ? 'rgba(239, 68, 68, 0.2)'
+                                  : 'rgba(156, 163, 175, 0.2)',
+                              color: note.summary.patient_mood === 'positive'
+                                ? '#10b981'
+                                : note.summary.patient_mood === 'concerned'
+                                  ? '#ef4444'
+                                  : '#9ca3af',
                               padding: '8px 16px',
                               borderRadius: '10px',
                               fontSize: '0.9rem',
@@ -368,16 +368,16 @@ function ClinicalNotes() {
                           )}
                           {note.summary.compliance_level && (
                             <span style={{
-                              background: note.summary.compliance_level === 'high' 
-                                ? 'rgba(16, 185, 129, 0.2)' 
-                                : note.summary.compliance_level === 'low' 
-                                ? 'rgba(239, 68, 68, 0.2)' 
-                                : 'rgba(245, 158, 11, 0.2)',
-                              color: note.summary.compliance_level === 'high' 
-                                ? '#10b981' 
-                                : note.summary.compliance_level === 'low' 
-                                ? '#ef4444' 
-                                : '#f59e0b',
+                              background: note.summary.compliance_level === 'high'
+                                ? 'rgba(16, 185, 129, 0.2)'
+                                : note.summary.compliance_level === 'low'
+                                  ? 'rgba(239, 68, 68, 0.2)'
+                                  : 'rgba(245, 158, 11, 0.2)',
+                              color: note.summary.compliance_level === 'high'
+                                ? '#10b981'
+                                : note.summary.compliance_level === 'low'
+                                  ? '#ef4444'
+                                  : '#f59e0b',
                               padding: '8px 16px',
                               borderRadius: '10px',
                               fontSize: '0.9rem',
@@ -396,8 +396,8 @@ function ClinicalNotes() {
                             padding: '18px',
                             borderRadius: '12px'
                           }}>
-                            <strong style={{ 
-                              color: '#ef4444', 
+                            <strong style={{
+                              color: '#ef4444',
                               fontSize: '1.05rem',
                               display: 'flex',
                               alignItems: 'center',
@@ -406,8 +406,8 @@ function ClinicalNotes() {
                             }}>
                               ⚠️ Follow-up Needed
                             </strong>
-                            <p style={{ 
-                              color: 'rgba(255, 255, 255, 0.95)', 
+                            <p style={{
+                              color: 'rgba(255, 255, 255, 0.95)',
                               margin: 0,
                               fontSize: '1rem',
                               lineHeight: '1.6'
@@ -449,17 +449,17 @@ function ClinicalNotes() {
                   >
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start' }}>
                       <div style={{ flex: 1 }}>
-                        <h3 style={{ 
-                          color: '#00FF88', 
-                          fontSize: '1.6rem', 
+                        <h3 style={{
+                          color: '#00FF88',
+                          fontSize: '1.6rem',
                           marginBottom: '12px',
                           fontWeight: '700'
                         }}>
                           {meeting.title || 'Follow-up Appointment'}
                         </h3>
-                        <p style={{ 
-                          color: 'rgba(255, 255, 255, 0.9)', 
-                          fontSize: '1.15rem', 
+                        <p style={{
+                          color: 'rgba(255, 255, 255, 0.9)',
+                          fontSize: '1.15rem',
                           marginBottom: '18px',
                           display: 'flex',
                           alignItems: 'center',
@@ -467,7 +467,7 @@ function ClinicalNotes() {
                         }}>
                           📆 {formatDate(meeting.scheduled_date || meeting.created_at)}
                         </p>
-                        
+
                         {meeting.extracted_phrase && (
                           <div style={{
                             background: 'rgba(102, 126, 234, 0.15)',
@@ -476,9 +476,9 @@ function ClinicalNotes() {
                             marginBottom: '15px',
                             border: '1px solid rgba(102, 126, 234, 0.3)'
                           }}>
-                            <p style={{ 
-                              color: 'rgba(255, 255, 255, 0.7)', 
-                              fontSize: '0.85rem', 
+                            <p style={{
+                              color: 'rgba(255, 255, 255, 0.7)',
+                              fontSize: '0.85rem',
                               margin: '0 0 8px 0',
                               textTransform: 'uppercase',
                               letterSpacing: '0.5px',
@@ -486,9 +486,9 @@ function ClinicalNotes() {
                             }}>
                               Detected from conversation:
                             </p>
-                            <p style={{ 
-                              color: 'white', 
-                              fontStyle: 'italic', 
+                            <p style={{
+                              color: 'white',
+                              fontStyle: 'italic',
                               margin: 0,
                               fontSize: '1.05rem',
                               lineHeight: '1.5'
