@@ -1,10 +1,22 @@
 import { useNavigate } from 'react-router-dom'
 import { useState, useEffect } from 'react'
+import { useMeetingMode } from '../contexts/MeetingModeContext'
 import '../styles/LandingPage.css'
 
 function LandingPage() {
   const navigate = useNavigate()
+  const { enabled, setEnabled } = useMeetingMode()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+
+  const handleToggleMeetingMode = () => {
+    if (!enabled) {
+      if (confirm('Enable Meeting Mode? This will allow voice monitoring during your session.')) {
+        setEnabled(true)
+      }
+    } else {
+      setEnabled(false)
+    }
+  }
 
   useEffect(() => {
     // Intersection Observer for scroll animations
@@ -311,11 +323,90 @@ function LandingPage() {
       <section id="roles" className="landing-section">
         <div className="landing-container">
           <div className="landing-section-header-wide animate-on-scroll">
-            <div className="landing-section-header-text">
-              <h2 className="landing-section-title">Choose Your View</h2>
-              <p className="landing-section-description">
-                Select your specialized interface to begin your rehabilitation journey.
-              </p>
+            <h2 className="landing-section-title">Choose Your View</h2>
+            <p className="landing-section-description">
+              Select your specialized interface to begin your rehabilitation journey.
+            </p>
+          </div>
+
+          {/* Meeting Mode Toggle */}
+
+          <div style={{
+            background: 'rgba(255, 255, 255, 0.03)',
+            backdropFilter: 'blur(10px)',
+            border: '1px solid rgba(255, 255, 255, 0.1)',
+            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.2)',
+            borderRadius: '24px',
+            padding: '30px 40px',
+            marginBottom: '50px',
+            maxWidth: '640px',
+            margin: '60px auto 50px auto'
+          }} className="animate-on-scroll">
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '30px' }}>
+              <div style={{ flex: 1 }}>
+                <h3 style={{
+                  color: '#ffffff',
+                  fontSize: '1.4rem',
+                  fontWeight: '600',
+                  marginBottom: '8px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '10px'
+                }}>
+                  Meeting Mode
+                  {enabled && <span style={{
+                    fontSize: '0.8rem',
+                    background: 'rgba(16, 185, 129, 0.2)',
+                    color: '#10b981',
+                    padding: '4px 10px',
+                    borderRadius: '12px',
+                    fontWeight: '700'
+                  }}>ENABLED</span>}
+                </h3>
+                <p style={{ color: 'rgba(255, 255, 255, 0.8)', fontSize: '0.95rem', margin: 0 }}>
+                  Enable voice monitoring for emergency detection, meeting scheduling, and clinical summaries
+                </p>
+              </div>
+
+              <label style={{
+                position: 'relative',
+                display: 'inline-block',
+                width: '60px',
+                height: '34px',
+                flexShrink: 0
+              }}>
+                <input
+                  type="checkbox"
+                  checked={enabled}
+                  onChange={handleToggleMeetingMode}
+                  style={{ opacity: 0, width: 0, height: 0 }}
+                />
+                <span style={{
+                  position: 'absolute',
+                  cursor: 'pointer',
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  background: enabled ? 'linear-gradient(135deg, #10b981 0%, #059669 100%)' : 'rgba(255, 255, 255, 0.2)',
+                  transition: '0.4s',
+                  borderRadius: '34px',
+                  border: enabled ? '2px solid #10b981' : '2px solid rgba(255, 255, 255, 0.3)'
+                }}>
+                  <span style={{
+                    position: 'absolute',
+                    content: '',
+                    height: '26px',
+                    width: '26px',
+                    left: enabled ? '30px' : '4px',
+                    bottom: '2px',
+                    background: 'white',
+                    transition: '0.4s',
+                    borderRadius: '50%',
+                    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.2)'
+                  }}></span>
+                </span>
+              </label>
             </div>
           </div>
 
@@ -394,12 +485,40 @@ function LandingPage() {
                 </div>
               </div>
             </div>
+
+            {/* Clinical Notes Card */}
+            <div
+              className="landing-role-card-premium animate-on-scroll"
+              onClick={() => navigate('/clinical-notes')}
+            >
+              <div className="landing-role-image-container">
+                <img
+                  src="/reports.png"
+                  alt="Clinical Notes"
+                  className="landing-role-image"
+                  onError={(e) => { e.target.src = '/analysis.png' }} // Fallback if image missing
+                />
+                <div className="landing-role-overlay"></div>
+              </div>
+              <div className="landing-role-content">
+                <div className="landing-role-info">
+                  <h3 className="landing-role-title">Clinical Notes</h3>
+                  <p className="landing-role-subtitle">AI Summaries & Meetings</p>
+                </div>
+                <div className="landing-role-tags">
+                  <span className="landing-role-tag">Documentation</span>
+                  <span className="landing-role-tag">AI Generated</span>
+                  <span className="landing-role-tag">Reports</span>
+                </div>
+              </div>
+            </div>
+
           </div>
         </div>
       </section>
 
       {/* Competitor Analysis Section */}
-      <section id="comparison" className="landing-section">
+      < section id="comparison" className="landing-section" >
         <div className="landing-container">
           <div className="landing-section-header">
             <span className="landing-section-badge">
@@ -573,8 +692,8 @@ function LandingPage() {
             <p>© 2025 PhysioLens. All rights reserved.</p>
           </div>
         </div>
-      </section>
-    </div>
+      </section >
+    </div >
   )
 }
 
